@@ -1,4 +1,5 @@
 import { Button, Stack } from "@mui/material";
+import { Link } from "react-router-dom";
 
 const Navigation = () => {
   return (
@@ -10,9 +11,9 @@ const Navigation = () => {
         flexWrap: "wrap",
       }}
     >
-      <Button color="inherit">Explore</Button>
-      <Button color="inherit">About</Button>
-      <Button variant="contained">Sign In</Button>
+      <Button component={Link} to="/" color="inherit">Explore</Button>
+      <Button component={Link} to="/about" color="inherit">About</Button>
+      <Button component={Link} to="/signin" variant="contained">Sign In</Button>
     </Stack>
   );
 };
