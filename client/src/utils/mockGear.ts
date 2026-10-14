@@ -1,6 +1,7 @@
 import type { GearPreview } from "../types/gear";
 
 export const mockGear: GearPreview[] = [
+  // GIBSON
   {
     id: "1",
     brand: "Gibson",
@@ -11,6 +12,35 @@ export const mockGear: GearPreview[] = [
     availability: "not_for_sale",
   },
   {
+    id: "5",
+    brand: "Gibson",
+    model: "Les Paul Junior",
+    category: "guitar",
+    year: 2010,
+    finish: "Black",
+    availability: "for_sale",
+  },
+  {
+    id: "6",
+    brand: "Gibson",
+    model: "SG Standard",
+    category: "guitar",
+    year: 2022,
+    finish: "Heritage Cherry",
+    availability: "open_to_trade",
+  },
+  {
+    id: "7",
+    brand: "Gibson",
+    model: "Les Paul Standard '50s",
+    category: "guitar",
+    year: 2023,
+    finish: "Gold Top",
+    availability: "not_for_sale",
+  },
+
+  // FENDER
+  {
     id: "2",
     brand: "Fender",
     model: "American Professional II Stratocaster",
@@ -19,6 +49,73 @@ export const mockGear: GearPreview[] = [
     finish: "Olympic White",
     availability: "open_to_trade",
   },
+  {
+    id: "8",
+    brand: "Fender",
+    model: "Jimi Hendrix Stratocaster",
+    category: "guitar",
+    year: 2022,
+    finish: "Olympic White",
+    availability: "not_for_sale",
+  },
+  {
+    id: "9",
+    brand: "Fender",
+    model: "Player Telecaster",
+    category: "guitar",
+    year: 2021,
+    finish: "Butterscotch Blonde",
+    availability: "for_sale",
+  },
+  {
+    id: "10",
+    brand: "Fender",
+    model: "American Performer Jazzmaster",
+    category: "guitar",
+    year: 2020,
+    finish: "Vintage White",
+    availability: "open_to_trade",
+  },
+
+  // AMPLIFIERS
+  {
+    id: "4",
+    brand: "Marshall",
+    model: "JCM800 2203",
+    category: "amp",
+    year: 1987,
+    finish: "Black",
+    availability: "not_for_sale",
+  },
+  {
+    id: "11",
+    brand: "Fender",
+    model: "'65 Deluxe Reverb Reissue",
+    category: "amp",
+    year: 2020,
+    finish: "Black",
+    availability: "for_sale",
+  },
+  {
+    id: "12",
+    brand: "Vox",
+    model: "AC30C2",
+    category: "amp",
+    year: 2018,
+    finish: "Black",
+    availability: "open_to_trade",
+  },
+  {
+    id: "13",
+    brand: "Orange",
+    model: "Rocker 15",
+    category: "amp",
+    year: 2022,
+    finish: "Orange",
+    availability: "not_for_sale",
+  },
+
+  // PEDALS
   {
     id: "3",
     brand: "Boss",
@@ -29,12 +126,12 @@ export const mockGear: GearPreview[] = [
     availability: "for_sale",
   },
   {
-    id: "4",
-    brand: "Marshall",
-    model: "JCM800 2203",
-    category: "amp",
-    year: 1987,
-    finish: "Black",
-    availability: "not_for_sale",
+    id: "14",
+    brand: "Ibanez",
+    model: "TS9 Tube Screamer",
+    category: "pedal",
+    year: 2021,
+    finish: "Green",
+    availability: "open_to_trade",
   },
 ];

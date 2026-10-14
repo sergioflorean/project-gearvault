@@ -4,14 +4,49 @@ import {
   Box,
   TextField,
   CircularProgress,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
 import Main from "../../components/Main/Main";
 import GearCard from "../../components/GearCard/GearCard";
 import { mockGear } from "../../utils/mockGear";
+import { useState } from "react";
+
+type CategoryFilter = "all" | "guitar" | "amp" | "pedal" | "";
 
 const Explore = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] =
+    useState<CategoryFilter>("all");
+
+  // const filteredGear = mockGear.filter(
+  //   (gear) =>
+  //     gear.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //     gear.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //     gear.category.toLowerCase().includes(searchQuery.toLowerCase()),
+  // );
+
+  const filteredGear = mockGear.filter((gear) => {
+    const searchTerms = searchQuery.toLowerCase().trim().split(/\s+/);
+
+    const gearText = `
+    ${gear.brand}
+    ${gear.model}
+    ${gear.category}
+    ${gear.finish ?? ""}
+  `.toLowerCase();
+
+    const matchesSearch = searchTerms.every((term) => gearText.includes(term));
+
+    const matchesCategory =
+      selectedCategory === "all" || gear.category === selectedCategory;
+
+    return matchesSearch && matchesCategory;
+  });
+
   const isLoading = false;
-  const hasResults = mockGear.length > 0;
+  const hasResults = filteredGear.length > 0;
+
   return (
     <Main>
       <Stack spacing={3} sx={{ maxWidth: 760 }}>
@@ -48,10 +83,33 @@ const Explore = () => {
         fullWidth
         placeholder="Search by brand, model, or category"
         variant="outlined"
+        value={searchQuery}
+        onChange={(event) => {
+          setSearchQuery(event.target.value);
+
+          console.log("Event target value:", event.target.value);
+          console.log("Search query state:", searchQuery);
+        }}
         sx={{
           maxWidth: 640,
         }}
       />
+      <ToggleButtonGroup
+        value={selectedCategory}
+        exclusive
+        onChange={(_event, newCategory: CategoryFilter | null) => {
+          if (newCategory !== null) {
+            setSelectedCategory(newCategory);
+          }
+        }}
+        size="small"
+        aria-label="Gear category"
+      >
+        <ToggleButton value="all">All</ToggleButton>
+        <ToggleButton value="guitar">Guitars</ToggleButton>
+        <ToggleButton value="amp">Amps</ToggleButton>
+        <ToggleButton value="pedal">Pedals</ToggleButton>
+      </ToggleButtonGroup>
 
       {isLoading ? (
         <Box
@@ -74,7 +132,7 @@ const Explore = () => {
             gap: 3,
           }}
         >
-          {mockGear.map((gear) => (
+          {filteredGear.map((gear) => (
             <GearCard key={gear.id} gear={gear} />
           ))}
         </Box>
