@@ -1,5 +1,7 @@
 import { Box, Chip, Stack, Typography } from "@mui/material";
+import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import type { GearPreview } from "../../types/gear";
+import AvailabilityBadge from "../AvailabilityBadge/AvailabilityBadge";
 
 interface GearCardProps {
   gear: GearPreview;
@@ -21,8 +23,38 @@ const GearCard = ({ gear }: GearCardProps) => {
         sx={{
           aspectRatio: "4 / 3",
           backgroundColor: "#ececea",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "hidden",
         }}
-      />
+      >
+        {gear.imageUrl ? (
+          <Box
+            component="img"
+            src={gear.imageUrl}
+            alt={`${gear.brand} ${gear.model}`}
+            sx={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+            }}
+          />
+        ) : (
+          <Stack spacing={1} sx={{ alignItems: "center" }}>
+            <ImageOutlinedIcon
+              sx={{
+                fontSize: 40,
+                color: "text.secondary",
+              }}
+            />
+
+            <Typography variant="body2" color="text.secondary">
+              Photo coming soon
+            </Typography>
+          </Stack>
+        )}
+      </Box>
 
       <Stack
         spacing={1.5}
@@ -48,14 +80,33 @@ const GearCard = ({ gear }: GearCardProps) => {
           }}
         >
           <Box>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                mb: 0.5,
+                fontSize: "0.75rem",
+                fontWeight: 600,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+              }}
+            >
               {gear.brand}
             </Typography>
 
             <Typography
               component="h2"
               variant="h6"
-              sx={{ fontWeight: 600, overflowWrap: "anywhere" }}
+              sx={{
+                fontSize: {
+                  xs: "1.25rem",
+                  sm: "1.375rem",
+                },
+                fontWeight: 600,
+                lineHeight: 1.3,
+                letterSpacing: "-0.025em",
+                overflowWrap: "anywhere",
+              }}
             >
               {gear.model}
             </Typography>
@@ -68,10 +119,22 @@ const GearCard = ({ gear }: GearCardProps) => {
           />
         </Stack>
 
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{
+            fontSize: "0.875rem",
+            fontWeight: 400,
+            lineHeight: 1.5,
+            letterSpacing: "0.01em",
+          }}
+        >
           {gear.year ?? "Year unknown"}
           {gear.finish ? ` · ${gear.finish}` : ""}
         </Typography>
+        <Box>
+          <AvailabilityBadge availability={gear.availability} />
+        </Box>
       </Stack>
     </Box>
   );

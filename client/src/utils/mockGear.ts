@@ -10,6 +10,7 @@ export const mockGear: GearPreview[] = [
     year: 2011,
     finish: "TV Yellow",
     availability: "not_for_sale",
+    imageUrl: "/images/gibson-junior-tv-yellow.jpg",
   },
   {
     id: "5",
@@ -86,6 +87,7 @@ export const mockGear: GearPreview[] = [
     year: 1987,
     finish: "Black",
     availability: "not_for_sale",
+    imageUrl: "/images/marshall-jcm800.jpg",
   },
   {
     id: "11",

@@ -10,5 +10,6 @@ export interface GearPreview {
   category: "guitar" | "amp" | "pedal";
   year?: number;
   finish?: string;
+  imageUrl?: string;
   availability: GearAvailability;
 }
