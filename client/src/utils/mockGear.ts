@@ -20,6 +20,7 @@ export const mockGear: GearPreview[] = [
     year: 2010,
     finish: "Black",
     availability: "for_sale",
+    imageUrl: "/images/gibson-junior-black.webp",
   },
   {
     id: "6",
@@ -29,6 +30,7 @@ export const mockGear: GearPreview[] = [
     year: 2022,
     finish: "Heritage Cherry",
     availability: "open_to_trade",
+    imageUrl: "/images/gibson-sg-cherry.jpg",
   },
   {
     id: "7",
@@ -38,6 +40,7 @@ export const mockGear: GearPreview[] = [
     year: 2023,
     finish: "Gold Top",
     availability: "not_for_sale",
+    imageUrl: "/images/gibson-standard-goldtop.png",
   },
 
   // FENDER
@@ -49,6 +52,7 @@ export const mockGear: GearPreview[] = [
     year: 2023,
     finish: "Olympic White",
     availability: "open_to_trade",
+    imageUrl: "/images/fender-american-pro-strat.jpg",
   },
   {
     id: "8",
@@ -58,6 +62,7 @@ export const mockGear: GearPreview[] = [
     year: 2022,
     finish: "Olympic White",
     availability: "not_for_sale",
+    imageUrl: "/images/fender-hendrix-strat.jpg",
   },
   {
     id: "9",
@@ -67,6 +72,7 @@ export const mockGear: GearPreview[] = [
     year: 2021,
     finish: "Butterscotch Blonde",
     availability: "for_sale",
+    imageUrl: "/images/fender-player-telecaster.jpg",
   },
   {
     id: "10",
@@ -76,6 +82,7 @@ export const mockGear: GearPreview[] = [
     year: 2020,
     finish: "Vintage White",
     availability: "open_to_trade",
+    imageUrl: "/images/fender-performer-jazzmaster.jpg",
   },
 
   // AMPLIFIERS
@@ -97,6 +104,7 @@ export const mockGear: GearPreview[] = [
     year: 2020,
     finish: "Black",
     availability: "for_sale",
+    imageUrl: "/images/fender-deluxe-reverb.jpg",
   },
   {
     id: "12",
@@ -106,6 +114,7 @@ export const mockGear: GearPreview[] = [
     year: 2018,
     finish: "Black",
     availability: "open_to_trade",
+    imageUrl: "/images/vox-ac30c2.jpg",
   },
   {
     id: "13",
@@ -115,6 +124,7 @@ export const mockGear: GearPreview[] = [
     year: 2022,
     finish: "Orange",
     availability: "not_for_sale",
+    imageUrl: "/images/orange-rocker-15.png",
   },
 
   // PEDALS
@@ -126,6 +136,7 @@ export const mockGear: GearPreview[] = [
     year: 2024,
     finish: "Blue",
     availability: "for_sale",
+    imageUrl: "/images/boss-ce2w.jpg",
   },
   {
     id: "14",
