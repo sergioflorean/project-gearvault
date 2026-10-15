@@ -1,7 +1,4 @@
-export type GearAvailability =
-  | "not_for_sale"
-  | "for_sale"
-  | "open_to_trade";
+export type GearAvailability = "not_for_sale" | "for_sale" | "open_to_trade";
 
 export interface GearPreview {
   id: string;
@@ -12,4 +9,22 @@ export interface GearPreview {
   finish?: string;
   imageUrl?: string;
   availability: GearAvailability;
+  identification?: GearIdentification;
+  marketData?: GearMarketData;
+}
+
+export interface GearIdentification {
+  manufacturingYear?: number;
+  country?: string;
+  factory?: string;
+}
+
+export interface GearMarketData {
+  source: "reverb";
+  listings: {
+    title: string;
+    price: number;
+    currency: string;
+    url?: string;
+  }[];
 }

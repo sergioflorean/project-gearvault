@@ -5,6 +5,7 @@ import { mockGear } from "../../utils/mockGear";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import AvailabilityBadge from "../../components/AvailabilityBadge/AvailabilityBadge";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import MarketInfo from "../../components/MarketInfo/MarketInfo";
 
 const GearDetail = () => {
   const { id } = useParams();
@@ -12,6 +13,15 @@ const GearDetail = () => {
   const location = useLocation();
 
   const gear = mockGear.find((item) => item.id === id);
+
+  const identification = gear?.identification;
+
+  const hasIdentification = Boolean(
+    identification &&
+    (identification.manufacturingYear !== undefined ||
+      identification.country ||
+      identification.factory),
+  );
 
   const handleBackToExplore = () => {
     if (location.state?.fromExplore) {
@@ -197,6 +207,97 @@ const GearDetail = () => {
               </Box>
             </Box>
           </Box>
+
+          <Box
+            component="section"
+            sx={{
+              maxWidth: 720,
+              border: 1,
+              borderColor: "divider",
+              borderRadius: 3,
+              backgroundColor: "background.paper",
+              p: {
+                xs: 3,
+                sm: 4,
+              },
+            }}
+          >
+            <Typography component="h2" variant="h5" sx={{ mb: 2 }}>
+              Identification
+            </Typography>
+
+            {hasIdentification && identification ? (
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: "repeat(2, minmax(0, 1fr))",
+                  },
+                  gap: 3,
+                }}
+              >
+                {identification.manufacturingYear !== undefined && (
+                  <Box>
+                    <Typography variant="body2" color="text.secondary">
+                      Manufacturing year
+                    </Typography>
+                    <Typography sx={{ fontWeight: 500 }}>
+                      {identification.manufacturingYear}
+                    </Typography>
+                  </Box>
+                )}
+
+                {identification.country && (
+                  <Box>
+                    <Typography variant="body2" color="text.secondary">
+                      Country
+                    </Typography>
+                    <Typography sx={{ fontWeight: 500 }}>
+                      {identification.country}
+                    </Typography>
+                  </Box>
+                )}
+
+                {identification.factory && (
+                  <Box>
+                    <Typography variant="body2" color="text.secondary">
+                      Factory
+                    </Typography>
+                    <Typography sx={{ fontWeight: 500 }}>
+                      {identification.factory}
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                Manufacturing details will appear here when available.
+              </Typography>
+            )}
+
+            <Box
+              sx={{
+                mt: 3,
+                pt: 3,
+                borderTop: 1,
+                borderColor: "divider",
+              }}
+            >
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                Serial number identification
+              </Typography>
+
+              <Typography variant="body2" color="text.secondary">
+                Coming soon. Serial number decoding will be available in a
+                future update.
+              </Typography>
+            </Box>
+          </Box>
+          <MarketInfo
+            gearName={`${gear.brand} ${gear.model}`}
+            marketData={gear.marketData}
+          />
         </Stack>
       ) : (
         <Stack
@@ -211,15 +312,12 @@ const GearDetail = () => {
           <Typography component="h1" variant="h4" sx={{ fontWeight: 600 }}>
             Gear not found
           </Typography>
-
           <Typography color="text.secondary">
             We couldn't find this instrument. The link may be incorrect or the
             item may no longer be available.
           </Typography>
-
-          <Button component={Link} to="/" variant="contained">
-            Back to Explore
-          </Button>
+          <Button component={Link} to="/" variant="contained"></Button>
+          Back to Explore
         </Stack>
       )}
     </Main>
