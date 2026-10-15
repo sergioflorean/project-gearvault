@@ -10,14 +10,43 @@ import {
 import Main from "../../components/Main/Main";
 import GearCard from "../../components/GearCard/GearCard";
 import { mockGear } from "../../utils/mockGear";
-import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 type CategoryFilter = "all" | "guitar" | "amp" | "pedal" | "";
 
 const Explore = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] =
-    useState<CategoryFilter>("all");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const searchQuery = searchParams.get("search") ?? "";
+
+  const categoryParam = searchParams.get("category");
+
+  const selectedCategory: CategoryFilter =
+    categoryParam === "guitar" ||
+    categoryParam === "amp" ||
+    categoryParam === "pedal"
+      ? categoryParam
+      : "all";
+
+  const updateFilter = (key: "search" | "category", value: string) => {
+    setSearchParams(
+      (previous) => {
+        const next = new URLSearchParams(previous);
+
+        if (value) {
+          next.set(key, value);
+        } else {
+          next.delete(key);
+        }
+
+        return next;
+      },
+      {
+        replace: true,
+        preventScrollReset: true,
+      },
+    );
+  };
 
   // Primera opcion de busqueda
   // const filteredGear = mockGear.filter(
@@ -110,7 +139,7 @@ const Explore = () => {
             placeholder="Search by brand, model, or category"
             variant="outlined"
             value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
+            onChange={(event) => updateFilter("search", event.target.value)}
             sx={{
               maxWidth: 640,
               "& .MuiOutlinedInput-root": {
@@ -130,7 +159,10 @@ const Explore = () => {
             exclusive
             onChange={(_event, newCategory: CategoryFilter | null) => {
               if (newCategory !== null) {
-                setSelectedCategory(newCategory);
+                updateFilter(
+                  "category",
+                  newCategory === "all" ? "" : newCategory,
+                );
               }
             }}
             size="small"

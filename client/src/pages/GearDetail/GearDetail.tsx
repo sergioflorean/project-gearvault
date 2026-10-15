@@ -1,19 +1,43 @@
 import { Box, Chip, Stack, Typography, Button } from "@mui/material";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation, useNavigate } from "react-router-dom";
 import Main from "../../components/Main/Main";
 import { mockGear } from "../../utils/mockGear";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import AvailabilityBadge from "../../components/AvailabilityBadge/AvailabilityBadge";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const GearDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const gear = mockGear.find((item) => item.id === id);
+
+  const handleBackToExplore = () => {
+    if (location.state?.fromExplore) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  };
 
   return (
     <Main>
       {gear ? (
         <Stack spacing={4}>
+          <Button
+            onClick={handleBackToExplore}
+            variant="text"
+            startIcon={<ArrowBackIcon />}
+            sx={{
+              alignSelf: "flex-start",
+              color: "text.secondary",
+              textTransform: "none",
+            }}
+          >
+            Back to Explore
+          </Button>
+
           <Box>
             <Typography
               variant="overline"
