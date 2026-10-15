@@ -35,6 +35,11 @@ const theme = createTheme({
       letterSpacing: "-0.03em",
     },
 
+    h5: {
+      fontWeight: 600,
+      letterSpacing: "-0.025em",
+    },
+
     button: {
       textTransform: "none",
       fontWeight: 600,

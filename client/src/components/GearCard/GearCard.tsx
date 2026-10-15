@@ -33,7 +33,7 @@ const GearCard = ({ gear }: GearCardProps) => {
           <Box
             component="img"
             src={gear.imageUrl}
-            alt={`${gear.brand} ${gear.model}`}
+            alt={`${gear.brand} ${gear.model}${gear.finish ? ` in ${gear.finish}` : ""}`}
             sx={{
               width: "100%",
               height: "100%",
