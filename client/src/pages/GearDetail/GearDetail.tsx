@@ -6,11 +6,16 @@ import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import AvailabilityBadge from "../../components/AvailabilityBadge/AvailabilityBadge";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import MarketInfo from "../../components/MarketInfo/MarketInfo";
+import { useEffect } from "react";
 
 const GearDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
 
   const gear = mockGear.find((item) => item.id === id);
 
@@ -316,8 +321,9 @@ const GearDetail = () => {
             We couldn't find this instrument. The link may be incorrect or the
             item may no longer be available.
           </Typography>
-          <Button component={Link} to="/" variant="contained"></Button>
-          Back to Explore
+          <Button component={Link} to="/" variant="contained">
+            Back to Explore
+          </Button>
         </Stack>
       )}
     </Main>

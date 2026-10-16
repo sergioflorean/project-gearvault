@@ -11,8 +11,7 @@ import SignUp from "./pages/SignUp/SignUp";
 import ToneHunter from "./pages/ToneHunter/ToneHunter";
 import MyCollection from "./pages/MyCollection/MyCollection";
 import Wantlist from "./pages/Wantlist/Wantlist";
-
-
+import NotFound from "./pages/NotFound/NotFound";
 
 const App = () => {
   return (
@@ -35,6 +34,7 @@ const App = () => {
         <Route path="/tone-hunter" element={<ToneHunter />} />
         <Route path="/my-collection" element={<MyCollection />} />
         <Route path="/wantlist" element={<Wantlist />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
 
       <Footer />
