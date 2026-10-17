@@ -19,7 +19,8 @@ const GearDetail = () => {
 
   const [marketResult, setMarketResult] = useState<{
     gearId: string;
-    data: GearMarketData;
+    status: "success" | "error";
+    data?: GearMarketData;
   } | null>(null);
 
   useEffect(() => {
@@ -27,6 +28,11 @@ const GearDetail = () => {
   }, [id]);
 
   const gear = mockGear.find((item) => item.id === id);
+
+  const marketStatus =
+    gear && marketResult && marketResult.gearId === gear.id
+      ? marketResult.status
+      : "loading";
 
   useEffect(() => {
     if (!gear) return;
@@ -46,12 +52,18 @@ const GearDetail = () => {
         if (isActive) {
           setMarketResult({
             gearId: gear.id,
+            status: "success",
             data: mappedData,
           });
         }
       } catch (error) {
         if (isActive) {
           console.error("Error loading Reverb listings:", error);
+
+          setMarketResult({
+            gearId: gear.id,
+            status: "error",
+          });
         }
       }
     };
@@ -346,9 +358,16 @@ const GearDetail = () => {
           <MarketInfo
             gearName={`${gear.brand} ${gear.model}`}
             marketData={
-              marketResult?.gearId === gear.id ? marketResult.data : undefined
+              marketResult && marketResult.gearId === gear.id
+                ? marketResult.data
+                : undefined
             }
-            isLoading={marketResult?.gearId !== gear.id}
+            isLoading={marketStatus === "loading"}
+            isEmpty={
+              marketStatus === "success" &&
+              marketResult?.data?.listings.length === 0
+            }
+            hasError={marketStatus === "error"}
           />
         </Stack>
       ) : (

@@ -5,12 +5,16 @@ interface MarketInfoProps {
   gearName: string;
   marketData?: GearMarketData;
   isLoading?: boolean;
+  isEmpty?: boolean;
+  hasError?: boolean;
 }
 
 const MarketInfo = ({
   gearName,
   marketData,
   isLoading = false,
+  isEmpty = false,
+  hasError = false,
 }: MarketInfoProps) => {
   const listingsCount = marketData?.listings.length ?? 0;
 
@@ -41,10 +45,19 @@ const MarketInfo = ({
             Loading market information...
           </Typography>
         </Stack>
+      ) : hasError ? (
+        <Typography variant="body2" color="error">
+          Something went wrong while fetching market data. Please check your
+          connection or try again later.
+        </Typography>
       ) : listingsCount > 0 ? (
         <Typography variant="body2" color="text.secondary">
           {listingsCount} {listingsCount === 1 ? "listing" : "listings"}{" "}
           available from Reverb for {gearName}.
+        </Typography>
+      ) : isEmpty ? (
+        <Typography variant="body2" color="text.secondary">
+          No listings found on Reverb for {gearName}.
         </Typography>
       ) : (
         <Stack spacing={1}>
