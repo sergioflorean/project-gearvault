@@ -40,7 +40,7 @@ const GearCard = ({ gear }: GearCardProps) => {
           "&:focus-visible": {
             outline: "1px solid",
             outlineColor: "primary.main",
-            // outlineOffset: "-1px",
+            outlineOffset: "-1px",
           },
         }}
       >
