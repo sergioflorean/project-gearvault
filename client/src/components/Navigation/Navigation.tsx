@@ -11,9 +11,18 @@ const Navigation = () => {
         flexWrap: "wrap",
       }}
     >
-      <Button component={Link} to="/" color="inherit">Explore</Button>
-      <Button component={Link} to="/about" color="inherit">About</Button>
-      <Button component={Link} to="/signin" variant="contained">Sign In</Button>
+      <Button component={Link} to="/" color="inherit">
+        Explore
+      </Button>
+      <Button component={Link} to="/my-collection" color="inherit">
+        My Collection
+      </Button>
+      <Button component={Link} to="/about" color="inherit">
+        About
+      </Button>
+      <Button component={Link} to="/signin" variant="contained">
+        Sign In
+      </Button>
     </Stack>
   );
 };
