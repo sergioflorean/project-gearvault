@@ -6,18 +6,62 @@ import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import AvailabilityBadge from "../../components/AvailabilityBadge/AvailabilityBadge";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import MarketInfo from "../../components/MarketInfo/MarketInfo";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { fetchReverbListings } from "../../utils/reverbApi";
+import { mapReverbListingsToMarketData } from "../../utils/reverbMapper";
+
+import type { GearMarketData } from "../../types/gear";
 
 const GearDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [marketResult, setMarketResult] = useState<{
+    gearId: string;
+    data: GearMarketData;
+  } | null>(null);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [id]);
 
   const gear = mockGear.find((item) => item.id === id);
+
+  useEffect(() => {
+    if (!gear) return;
+
+    let isActive = true;
+
+    const loadListings = async () => {
+      try {
+        const response = await fetchReverbListings(gear.brand, gear.model);
+
+        const mappedData = mapReverbListingsToMarketData(
+          response,
+          gear.brand,
+          gear.model,
+        );
+
+        if (isActive) {
+          setMarketResult({
+            gearId: gear.id,
+            data: mappedData,
+          });
+        }
+      } catch (error) {
+        if (isActive) {
+          console.error("Error loading Reverb listings:", error);
+        }
+      }
+    };
+
+    void loadListings();
+
+    return () => {
+      isActive = false;
+    };
+  }, [gear]);
 
   const identification = gear?.identification;
 
@@ -301,7 +345,10 @@ const GearDetail = () => {
           </Box>
           <MarketInfo
             gearName={`${gear.brand} ${gear.model}`}
-            marketData={gear.marketData}
+            marketData={
+              marketResult?.gearId === gear.id ? marketResult.data : undefined
+            }
+            isLoading={marketResult?.gearId !== gear.id}
           />
         </Stack>
       ) : (

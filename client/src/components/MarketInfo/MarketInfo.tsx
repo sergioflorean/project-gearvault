@@ -1,12 +1,17 @@
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography, CircularProgress } from "@mui/material";
 import type { GearMarketData } from "../../types/gear";
 
 interface MarketInfoProps {
   gearName: string;
   marketData?: GearMarketData;
+  isLoading?: boolean;
 }
 
-const MarketInfo = ({ gearName, marketData }: MarketInfoProps) => {
+const MarketInfo = ({
+  gearName,
+  marketData,
+  isLoading = false,
+}: MarketInfoProps) => {
   const listingsCount = marketData?.listings.length ?? 0;
 
   return (
@@ -28,7 +33,15 @@ const MarketInfo = ({ gearName, marketData }: MarketInfoProps) => {
         Market Information
       </Typography>
 
-      {listingsCount > 0 ? (
+      {isLoading ? (
+        <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
+          <CircularProgress size={20} color="inherit" />
+
+          <Typography variant="body2" color="text.secondary">
+            Loading market information...
+          </Typography>
+        </Stack>
+      ) : listingsCount > 0 ? (
         <Typography variant="body2" color="text.secondary">
           {listingsCount} {listingsCount === 1 ? "listing" : "listings"}{" "}
           available from Reverb for {gearName}.
