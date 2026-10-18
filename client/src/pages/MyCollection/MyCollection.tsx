@@ -1,17 +1,8 @@
 import { useState, type FormEvent } from "react";
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Stack,
-  Typography,
-  TextField,
-  MenuItem,
-} from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import Main from "../../components/Main/Main";
+import GearCard from "../../components/GearCard/GearCard";
+import InstrumentFormDialog from "../../components/InstrumentFormDialog/InstrumentFormDialog";
 
 import type { CollectionItem } from "../../types/collection";
 
@@ -21,8 +12,6 @@ const MyCollection = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [collection, setCollection] =
     useState<CollectionItem[]>(loadCollection);
-  const [editingInstrument, setEditingInstrument] =
-    useState<CollectionItem | null>(null);
 
   const collectionStats = {
     total: collection.length,
@@ -62,45 +51,11 @@ const MyCollection = () => {
       addedAt: new Date().toISOString(),
     };
 
-    const updatedCollection = editingInstrument
-      ? collection.map((instrument) =>
-          instrument.id === editingInstrument.id
-            ? {
-                ...instrument,
-                ...newInstrument,
-                id: instrument.id,
-                addedAt: instrument.addedAt,
-              }
-            : instrument,
-        )
-      : [...collection, newInstrument];
+    const updatedCollection = [...collection, newInstrument];
 
     saveCollection(updatedCollection);
     setCollection(updatedCollection);
 
-    setIsDialogOpen(false);
-  };
-
-  const handleOpenEdit = (instrument: CollectionItem) => {
-    setEditingInstrument(instrument);
-    setIsDialogOpen(true);
-  };
-
-  const handleRemoveInstrument = (id: string) => {
-    const confirmed = window.confirm(
-      "Remove this instrument from your collection?",
-    );
-
-    if (!confirmed) return;
-
-    const updatedCollection = collection.filter(
-      (instrument) => instrument.id !== id,
-    );
-
-    saveCollection(updatedCollection);
-    setCollection(updatedCollection);
-
-    setEditingInstrument(null);
     setIsDialogOpen(false);
   };
 
@@ -128,7 +83,6 @@ const MyCollection = () => {
           <Button
             variant="contained"
             onClick={() => {
-              setEditingInstrument(null);
               setIsDialogOpen(true);
             }}
             sx={{ textTransform: "none" }}
@@ -210,176 +164,22 @@ const MyCollection = () => {
             }}
           >
             {collection.map((instrument) => (
-              <Box
+              <GearCard
                 key={instrument.id}
-                sx={{
-                  border: 1,
-                  borderColor: "divider",
-                  borderRadius: 3,
-                  overflow: "hidden",
-                }}
-              >
-                <Box
-                  sx={{
-                    aspectRatio: "4 / 3",
-                    bgcolor: "action.hover",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    p: 2,
-                  }}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    Your photos coming in Stage 2
-                  </Typography>
-                </Box>
-
-                <Stack spacing={1} sx={{ p: 3 }}>
-                  <Typography variant="overline" color="text.secondary">
-                    {instrument.brand}
-                  </Typography>
-
-                  <Typography variant="h6">{instrument.model}</Typography>
-
-                  <Typography variant="body2" color="text.secondary">
-                    {instrument.year ?? "Year unknown"}
-                    {instrument.finish ? ` · ${instrument.finish}` : ""}
-                  </Typography>
-
-                  <Typography variant="caption" color="text.secondary">
-                    {instrument.category.toUpperCase()}
-                  </Typography>
-                  <Button
-                    variant="text"
-                    color="inherit"
-                    size="small"
-                    onClick={() => handleOpenEdit(instrument)}
-                    sx={{
-                      alignSelf: "flex-start",
-                      textTransform: "none",
-                    }}
-                  >
-                    Edit
-                  </Button>
-                </Stack>
-              </Box>
+                gear={instrument}
+                source="collection"
+              />
             ))}
           </Box>
         )}
       </Stack>
 
-      <Dialog
+      <InstrumentFormDialog
         open={isDialogOpen}
+        instrument={null}
         onClose={() => setIsDialogOpen(false)}
-        fullWidth
-        maxWidth="sm"
-      >
-        <DialogTitle>
-          {editingInstrument ? "Edit Instrument" : "Add Instrument"}
-        </DialogTitle>
-
-        <DialogContent>
-          <Stack
-            component="form"
-            key={editingInstrument?.id ?? "new"}
-            id="add-instrument-form"
-            spacing={2}
-            sx={{ pt: 1 }}
-            onSubmit={handleAddInstrument}
-          >
-            <TextField
-              name="brand"
-              label="Brand"
-              placeholder="e.g. Gibson"
-              defaultValue={editingInstrument?.brand ?? ""}
-              required
-              fullWidth
-            />
-
-            <TextField
-              name="model"
-              label="Model"
-              placeholder="e.g. Les Paul Junior"
-              defaultValue={editingInstrument?.model ?? ""}
-              required
-              fullWidth
-            />
-
-            <TextField
-              name="category"
-              label="Category"
-              select
-              defaultValue={editingInstrument?.category ?? "guitar"}
-              required
-              fullWidth
-            >
-              <MenuItem value="guitar">Guitar</MenuItem>
-              <MenuItem value="amp">Amplifier</MenuItem>
-              <MenuItem value="pedal">Pedal</MenuItem>
-            </TextField>
-
-            <TextField
-              name="year"
-              label="Year"
-              type="number"
-              defaultValue={editingInstrument?.year ?? ""}
-              placeholder="e.g. 2011"
-              fullWidth
-            />
-
-            <TextField
-              name="finish"
-              label="Finish"
-              placeholder="e.g. TV Yellow"
-              defaultValue={editingInstrument?.finish ?? ""}
-              fullWidth
-            />
-
-            <TextField
-              name="serialNumber"
-              label="Serial Number"
-              placeholder="Enter serial number"
-              defaultValue={editingInstrument?.serialNumber ?? ""}
-              fullWidth
-            />
-
-            <TextField
-              name="availability"
-              label="Availability"
-              select
-              defaultValue={editingInstrument?.availability ?? "not_for_sale"}
-              fullWidth
-            >
-              <MenuItem value="not_for_sale">Not for sale</MenuItem>
-              <MenuItem value="for_sale">For sale</MenuItem>
-              <MenuItem value="open_to_trade">Open to trade</MenuItem>
-            </TextField>
-          </Stack>
-        </DialogContent>
-
-        <DialogActions sx={{ p: 3 }}>
-          {editingInstrument && (
-            <Button
-              type="button"
-              size="small"
-              color="error"
-              onClick={() => handleRemoveInstrument(editingInstrument.id)}
-              sx={{
-                mr: "auto",
-                textTransform: "none",
-                color: "error.main",
-              }}
-            >
-              Delete Instrument
-            </Button>
-          )}
-          <Button onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-
-          <Button variant="contained" type="submit" form="add-instrument-form">
-            {editingInstrument ? "Save Changes" : "Save Instrument"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onSubmit={handleAddInstrument}
+      />
     </Main>
   );
 };

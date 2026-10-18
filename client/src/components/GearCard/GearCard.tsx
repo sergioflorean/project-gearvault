@@ -6,13 +6,15 @@ import { Link } from "react-router-dom";
 
 interface GearCardProps {
   gear: GearPreview;
+  source?: "explore" | "collection";
 }
 
-const GearCard = ({ gear }: GearCardProps) => {
+const GearCard = ({ gear, source = "explore" }: GearCardProps) => {
   return (
     <Box
       component="article"
       sx={{
+        flexGrow: 1,
         border: 1,
         borderColor: "divider",
         borderRadius: 3,
@@ -23,7 +25,11 @@ const GearCard = ({ gear }: GearCardProps) => {
       <Box
         component={Link}
         to={`/gear/${gear.id}`}
-        state={{ fromExplore: true }}
+        state={
+          source === "collection"
+            ? { fromCollection: true }
+            : { fromExplore: true }
+        }
         sx={{
           display: "block",
           height: "100%",

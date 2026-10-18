@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import Main from "../../components/Main/Main";
 import GearCard from "../../components/GearCard/GearCard";
-import { mockGear } from "../../utils/mockGear";
+import { getExploreGear } from "../../utils/exploreGear";
 import { useSearchParams } from "react-router-dom";
 
 type CategoryFilter = "all" | "guitar" | "amp" | "pedal" | "";
@@ -57,7 +57,8 @@ const Explore = () => {
   // );
 
   // Segunda opcion: busqueda combinada
-  const filteredGear = mockGear.filter((gear) => {
+  const exploreGear = getExploreGear();
+  const filteredGear = exploreGear.filter((gear) => {
     const searchTerms = searchQuery.toLowerCase().trim().split(/\s+/);
 
     const gearText = `

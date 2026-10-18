@@ -1,15 +1,8 @@
-import type { GearPreview, GearAvailability } from "./gear";
+import type { GearPreview } from "./gear";
 
-export interface CollectionItem {
-  id: string;
+export interface CollectionItem extends GearPreview {
   catalogGearId?: string;
-  brand: string;
-  model: string;
-  category: GearPreview["category"];
-  year?: number;
-  finish?: string;
   serialNumber?: string;
-  availability: GearAvailability;
   photoUrls?: string[];
   addedAt: string;
 }
