@@ -161,11 +161,28 @@ const MarketInfo = ({
                   href={listing.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  underline="hover"
+                  underline="always"
                   color="text.primary"
                   variant="body2"
+                  sx={{
+                    textUnderlineOffset: "3px",
+                    "&:hover": {
+                      color: "primary.main",
+                    },
+                  }}
                 >
                   {listing.title}
+                  <Box
+                    component="span"
+                    sx={{
+                      display: "block",
+                      mt: 0.5,
+                      fontSize: "0.75rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    View on Reverb ↗
+                  </Box>
                 </Link>
               ) : (
                 <Typography variant="body2">{listing.title}</Typography>

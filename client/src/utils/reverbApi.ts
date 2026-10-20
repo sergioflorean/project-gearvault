@@ -19,7 +19,7 @@ export const fetchReverbListings = async (
   const query = `${brand} ${model}`.trim().replace(/\s+/g, " ").toLowerCase();
 
   url.searchParams.set("query", query);
-  url.searchParams.set("per_page", "50");
+  url.searchParams.set("per_page", "20");
   url.searchParams.set("product_type", PRODUCT_TYPES[category]);
 
   let response: Response;

@@ -1,1 +1,1 @@
-export const INITIAL_LISTINGS = 5;
+export const INITIAL_LISTINGS = 4;
