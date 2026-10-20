@@ -14,7 +14,6 @@ const MyCollection = () => {
     useState<CollectionItem[]>(loadCollection);
 
   const collectionStats = {
-    total: collection.length,
     guitars: collection.filter((instrument) => instrument.category === "guitar")
       .length,
     amps: collection.filter((instrument) => instrument.category === "amp")

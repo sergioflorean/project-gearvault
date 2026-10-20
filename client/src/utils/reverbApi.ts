@@ -1,15 +1,26 @@
 import { REVERB_LISTINGS_URL, REVERB_HEADERS } from "./reverbConfig";
 
 import type { ReverbListingsResponse } from "../types/reverb";
+import type { GearPreview } from "../types/gear";
+
+const PRODUCT_TYPES: Record<GearPreview["category"], string> = {
+  guitar: "electric-guitars",
+  amp: "amps",
+  pedal: "effects-and-pedals",
+};
 
 export const fetchReverbListings = async (
   brand: string,
   model: string,
+  category: GearPreview["category"],
 ): Promise<ReverbListingsResponse> => {
   const url = new URL(REVERB_LISTINGS_URL);
 
-  url.searchParams.set("query", `${brand} ${model}`);
-  url.searchParams.set("per_page", "10");
+  const query = `${brand} ${model}`.trim().replace(/\s+/g, " ").toLowerCase();
+
+  url.searchParams.set("query", query);
+  url.searchParams.set("per_page", "50");
+  url.searchParams.set("product_type", PRODUCT_TYPES[category]);
 
   let response: Response;
 

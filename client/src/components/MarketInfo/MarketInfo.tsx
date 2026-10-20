@@ -7,7 +7,9 @@ import {
   Button,
 } from "@mui/material";
 import type { GearMarketData } from "../../types/gear";
+import { calculateMarketStats } from "../../utils/marketStats";
 import { useState } from "react";
+import { INITIAL_LISTINGS } from "../../utils/marketConfig";
 
 interface MarketInfoProps {
   gearName: string;
@@ -27,8 +29,16 @@ const MarketInfo = ({
   const listings = marketData?.listings ?? [];
   const listingsCount = listings.length;
 
+  const marketStats = calculateMarketStats(listings);
+
+  const formatMarketPrice = (price: number, currency: string) =>
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 0,
+    }).format(price);
+
   const [showAll, setShowAll] = useState(false);
-  const INITIAL_LISTINGS = 2;
   const visibleListings = showAll
     ? listings
     : listings.slice(0, INITIAL_LISTINGS);
@@ -67,21 +77,85 @@ const MarketInfo = ({
         </Typography>
       ) : listingsCount > 0 ? (
         <Stack spacing={2}>
+          {marketStats ? (
+            <Box
+              sx={{
+                border: 1,
+                borderColor: "divider",
+                borderRadius: 3,
+                backgroundColor: "action.hover",
+                p: { xs: 2.5, sm: 3 },
+              }}
+            >
+              <Stack spacing={1.5}>
+                <Typography
+                  variant="overline"
+                  color="text.secondary"
+                  sx={{ letterSpacing: "0.12em", fontWeight: 600 }}
+                >
+                  Market Price Reference
+                </Typography>
+
+                <Box>
+                  <Typography variant="body2" color="text.secondary">
+                    Typical asking price
+                  </Typography>
+
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      fontWeight: 600,
+                      letterSpacing: "-0.03em",
+                      mt: 0.5,
+                    }}
+                  >
+                    {formatMarketPrice(
+                      marketStats.median,
+                      marketStats.currency,
+                    )}
+                  </Typography>
+                </Box>
+
+                {marketStats.sampleSize >= 5 && (
+                  <Box>
+                    <Typography variant="body2" color="text.secondary">
+                      Common price range
+                    </Typography>
+
+                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                      {formatMarketPrice(marketStats.low, marketStats.currency)}
+                      {" – "}
+                      {formatMarketPrice(
+                        marketStats.high,
+                        marketStats.currency,
+                      )}
+                    </Typography>
+                  </Box>
+                )}
+
+                <Typography variant="caption" color="text.secondary">
+                  Based on {marketStats.sampleSize} matching listings in{" "}
+                  {marketStats.currency}. These are asking prices, not confirmed
+                  sale prices or an official appraisal.
+                </Typography>
+              </Stack>
+            </Box>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              Not enough comparable listings to calculate a price reference.
+            </Typography>
+          )}
           <Typography variant="body2" color="text.secondary">
             {listingsCount} {listingsCount === 1 ? "listing" : "listings"}{" "}
-            available from Reverb for {gearName}.
+            loaded from Reverb for {gearName}.
           </Typography>
           <Typography variant="caption" color="text.secondary">
             Third-party Reverb listings, separate from the owner's availability
             status.
           </Typography>
 
-          {visibleListings.map((listing, index) => (
-            <Stack
-              key={`${listing.title}-${index}`}
-              spacing={0.5}
-              sx={{ py: 1 }}
-            >
+          {visibleListings.map((listing) => (
+            <Stack key={listing.id} spacing={0.5} sx={{ py: 1 }}>
               {listing.url ? (
                 <Link
                   href={listing.url}

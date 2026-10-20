@@ -59,7 +59,11 @@ const GearDetail = () => {
     let isActive = true;
     const loadListings = async () => {
       try {
-        const response = await fetchReverbListings(gear.brand, gear.model);
+        const response = await fetchReverbListings(
+          gear.brand,
+          gear.model,
+          gear.category,
+        );
         const mappedData = mapReverbListingsToMarketData(
           response,
           gear.brand,

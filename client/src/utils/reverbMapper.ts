@@ -37,6 +37,7 @@ export const mapReverbListingsToMarketData = (
       );
     })
     .map((listing) => ({
+      id: listing.id,
       title: listing.title,
       price: Number(listing.price.amount),
       currency: listing.price.currency,

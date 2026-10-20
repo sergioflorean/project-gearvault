@@ -13,17 +13,17 @@ const Header = () => {
     >
       <Container maxWidth="lg">
         <Stack
-  direction={{ xs: "column", sm: "row" }}
-  spacing={2}
-  sx={{
-    py: 2,
-    alignItems: {
-      xs: "flex-start",
-      sm: "center",
-    },
-    justifyContent: "space-between",
-  }}
->
+          direction={{ xs: "column", sm: "row" }}
+          spacing={2}
+          sx={{
+            py: 2,
+            alignItems: {
+              xs: "flex-start",
+              sm: "center",
+            },
+            justifyContent: "space-between",
+          }}
+        >
           <Typography
             component="div"
             variant="h6"

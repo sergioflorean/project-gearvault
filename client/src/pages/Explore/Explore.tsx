@@ -3,7 +3,6 @@ import {
   Typography,
   Box,
   TextField,
-  CircularProgress,
   ToggleButton,
   ToggleButtonGroup,
 } from "@mui/material";
@@ -48,15 +47,6 @@ const Explore = () => {
     );
   };
 
-  // Primera opcion de busqueda
-  // const filteredGear = mockGear.filter(
-  //   (gear) =>
-  //     gear.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-  //     gear.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
-  //     gear.category.toLowerCase().includes(searchQuery.toLowerCase()),
-  // );
-
-  // Segunda opcion: busqueda combinada
   const exploreGear = getExploreGear();
   const filteredGear = exploreGear.filter((gear) => {
     const searchTerms = searchQuery.toLowerCase().trim().split(/\s+/);
@@ -76,7 +66,6 @@ const Explore = () => {
     return matchesSearch && matchesCategory;
   });
 
-  const isLoading = false;
   const hasResults = filteredGear.length > 0;
 
   return (
@@ -200,25 +189,7 @@ const Explore = () => {
             </Typography>
           </Stack>
 
-          {isLoading ? (
-            <Box
-              role="status"
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 2,
-                minHeight: 240,
-              }}
-            >
-              <CircularProgress size={32} />
-
-              <Typography variant="body2" color="text.secondary">
-                Loading gear...
-              </Typography>
-            </Box>
-          ) : hasResults ? (
+          {hasResults ? (
             <Box
               sx={{
                 display: "grid",

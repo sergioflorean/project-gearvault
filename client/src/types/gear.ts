@@ -22,6 +22,7 @@ export interface GearIdentification {
 export interface GearMarketData {
   source: "reverb";
   listings: {
+    id: number;
     title: string;
     price: number;
     currency: string;

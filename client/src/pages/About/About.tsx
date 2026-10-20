@@ -47,10 +47,11 @@ const About = () => {
               lineHeight: 1.8,
             }}
           >
-            GearVault is a platform for cataloging guitars, amplifiers, and
-            pedals. Explore instrument specifications, organize your collection,
-            and track availability, with identification and market information
-            features being developed.
+            GearVault is a platform for guitarists to explore, catalog, and
+            manage guitars, amplifiers, and pedals. Build your personal
+            collection, explore a demo gear catalog, and view live marketplace
+            listings from Reverb. Authentication, photo uploads, and shared
+            community data are planned for Stage 2.
           </Typography>
         </Stack>
 
@@ -112,8 +113,9 @@ const About = () => {
                 <Typography variant="h6">Gear identification</Typography>
 
                 <Typography variant="body2" color="text.secondary">
-                  Explore instrument details and discover manufacturing
-                  information when available.
+                  Explore live marketplace listings and asking prices from
+                  Reverb, with results matched to each instrument's brand and
+                  model.
                 </Typography>
               </Stack>
             </Box>
@@ -218,7 +220,13 @@ const About = () => {
             >
               <Stack spacing={1.5}>
                 <Typography variant="overline" color="text.secondary">
-                  PLANNED
+                  CURRENT
+                </Typography>
+
+                <Typography variant="h6">Market integration</Typography>
+
+                <Typography variant="body2" color="text.secondary">
+                  Reverb API
                 </Typography>
 
                 <Typography variant="h6">Market integration</Typography>
@@ -241,23 +249,42 @@ const About = () => {
         >
           <Stack spacing={2}>
             <Typography variant="body2" color="text.secondary">
-              GearVault is currently in development. Collection management,
-              serial number identification, and live market information are
-              planned features.
+              GearVault is currently a frontend prototype. Personal collection
+              management and live Reverb market listings are implemented. User
+              authentication, serial number decoding, photo uploads, and shared
+              community data are planned for Stage 2.
             </Typography>
 
-            <Typography variant="body2" color="text.secondary">
-              Developed by Sergio ·{" "}
-              <Link
-                href="https://github.com/sergioflorean"
-                target="_blank"
-                rel="noopener noreferrer"
-                underline="hover"
-                color="text.primary"
+            <Box component="section" aria-labelledby="about-author-heading">
+              <Typography
+                id="about-author-heading"
+                component="h2"
+                variant="h6"
+                sx={{ mb: 1 }}
               >
-                GitHub
-              </Link>
-            </Typography>
+                About the Author
+              </Typography>
+
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                GearVault was developed as part of the TripleTen Software
+                Engineering program. The project combines a passion for guitars
+                and music equipment with frontend development using React,
+                TypeScript, and modern web technologies.
+              </Typography>
+
+              <Typography variant="body2" color="text.secondary">
+                Developed by Sergio ·{" "}
+                <Link
+                  href="https://github.com/sergioflorean"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  underline="hover"
+                  color="text.primary"
+                >
+                  GitHub
+                </Link>
+              </Typography>
+            </Box>
           </Stack>
         </Box>
 
