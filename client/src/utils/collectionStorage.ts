@@ -29,6 +29,7 @@ type EditableInstrumentFields = Pick<
   | "finish"
   | "serialNumber"
   | "availability"
+  | "imageUrl"
 >;
 
 export const updateCollectionItem = (

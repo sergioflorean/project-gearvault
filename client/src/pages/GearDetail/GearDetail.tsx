@@ -124,6 +124,7 @@ const GearDetail = () => {
       finish: String(formData.get("finish") ?? "").trim() || undefined,
       serialNumber:
         String(formData.get("serialNumber") ?? "").trim() || undefined,
+      imageUrl: String(formData.get("imageUrl") ?? "").trim() || undefined,
       availability: formData.get(
         "availability",
       ) as CollectionItem["availability"],

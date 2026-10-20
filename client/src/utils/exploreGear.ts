@@ -11,7 +11,7 @@ export const getExploreGear = (): GearPreview[] => {
     year: instrument.year,
     finish: instrument.finish,
     availability: instrument.availability,
-    imageUrl: instrument.photoUrls?.[0],
+    imageUrl: instrument.imageUrl ?? instrument.photoUrls?.[0],
   }));
 
   return [...collectionGear, ...mockGear];

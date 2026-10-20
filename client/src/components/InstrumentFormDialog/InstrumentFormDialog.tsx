@@ -94,6 +94,15 @@ const InstrumentFormDialog = ({
           />
 
           <TextField
+            name="imageUrl"
+            label="Image URL (Optional)"
+            placeholder="https://example.com/guitar.jpg"
+            helperText="Paste a direct image link, or leave this blank."
+            defaultValue={instrument?.imageUrl ?? ""}
+            fullWidth
+          />
+
+          <TextField
             name="availability"
             label="Availability"
             select

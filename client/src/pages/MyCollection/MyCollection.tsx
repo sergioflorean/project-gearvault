@@ -14,6 +14,7 @@ const MyCollection = () => {
     useState<CollectionItem[]>(loadCollection);
 
   const collectionStats = {
+    total: collection.length,
     guitars: collection.filter((instrument) => instrument.category === "guitar")
       .length,
     amps: collection.filter((instrument) => instrument.category === "amp")
@@ -21,6 +22,10 @@ const MyCollection = () => {
     pedals: collection.filter((instrument) => instrument.category === "pedal")
       .length,
   };
+
+  const sortedCollection = [...collection].sort(
+    (a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime(),
+  );
 
   const handleAddInstrument = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -35,6 +40,7 @@ const MyCollection = () => {
     const yearValue = String(formData.get("year") ?? "").trim();
     const finish = String(formData.get("finish") ?? "").trim();
     const serialNumber = String(formData.get("serialNumber") ?? "").trim();
+    const imageUrl = String(formData.get("imageUrl") ?? "").trim();
 
     const newInstrument: CollectionItem = {
       id: crypto.randomUUID(),
@@ -44,6 +50,7 @@ const MyCollection = () => {
       year: yearValue ? Number(yearValue) : undefined,
       finish: finish || undefined,
       serialNumber: serialNumber || undefined,
+      imageUrl: imageUrl || undefined,
       availability: formData.get(
         "availability",
       ) as CollectionItem["availability"],
@@ -162,7 +169,7 @@ const MyCollection = () => {
               gap: 3,
             }}
           >
-            {collection.map((instrument) => (
+            {sortedCollection.map((instrument) => (
               <GearCard
                 key={instrument.id}
                 gear={instrument}
