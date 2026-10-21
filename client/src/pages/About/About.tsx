@@ -110,12 +110,11 @@ const About = () => {
               <Stack spacing={2}>
                 <SearchOutlinedIcon color="action" />
 
-                <Typography variant="h6">Gear identification</Typography>
+                <Typography variant="h6">Marketplace search</Typography>
 
                 <Typography variant="body2" color="text.secondary">
-                  Explore live marketplace listings and asking prices from
-                  Reverb, with results matched to each instrument's brand and
-                  model.
+                  View live Reverb listings and market price references based on
+                  comparable asking prices.
                 </Typography>
               </Stack>
             </Box>
@@ -221,12 +220,6 @@ const About = () => {
               <Stack spacing={1.5}>
                 <Typography variant="overline" color="text.secondary">
                   CURRENT
-                </Typography>
-
-                <Typography variant="h6">Market integration</Typography>
-
-                <Typography variant="body2" color="text.secondary">
-                  Reverb API
                 </Typography>
 
                 <Typography variant="h6">Market integration</Typography>
