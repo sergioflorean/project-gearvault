@@ -20,7 +20,7 @@ export const mockGear: GearPreview[] = [
     year: 2010,
     finish: "Black",
     availability: "for_sale",
-    imageUrl: "/images/gibson-junior-black.webp",
+    imageUrl: "/images/gibson-junior-black.jpg",
   },
   {
     id: "6",
@@ -146,5 +146,6 @@ export const mockGear: GearPreview[] = [
     year: 2021,
     finish: "Green",
     availability: "open_to_trade",
+    imageUrl: "/images/ibanez-ts9.jpg",
   },
 ];
