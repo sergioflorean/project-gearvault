@@ -1,6 +1,7 @@
 import "dotenv/config";
 
 import express from "express";
+import mongoose from "mongoose";
 
 const app = express();
 
@@ -14,7 +15,20 @@ app.get("/health", (_req, res) => {
 });
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+
+mongoose
+  .connect(process.env.MONGO_URI!, {
+    maxPoolSize: 10,
+  })
+  .then(() => {
+    console.log("MongoDB connected successfully");
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to connect to MongoDB", err);
+    process.exit(1);
+  });
+
 export default app;
