@@ -4,11 +4,13 @@ import express from "express";
 import mongoose from "mongoose";
 import authRoutes from "./routes/auth.js";
 import { notFoundHandler, errorHandler } from "./middleware/error.js";
+import instrumentRoutes from "./routes/instruments.js";
 
 const app = express();
 
 app.use(express.json());
 app.use(authRoutes);
+app.use(instrumentRoutes);
 
 app.get("/health", (_req, res) => {
   res.status(200).json({
