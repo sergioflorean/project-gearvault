@@ -10,13 +10,21 @@ The API is part of the GearVault Stage 2 capstone project for the TripleTen Soft
 
 ## Current Status
 
-**Stage 2 — Backend Implemented · Production Release Pending**
+**Stage 2 — Backend Live in Production**
 
-The backend supports user registration, authentication, persistent instrument collections, authorization, and public catalog access.
+The Express API is deployed on Vercel and connected to MongoDB Atlas.
 
-Local development and build checks have been completed.
+Production URL:
 
-A Vercel Preview deployment has been tested successfully through its health endpoint. Final production deployment and end-to-end verification are pending.
+https://gearvault-api.vercel.app
+
+Health endpoint:
+
+https://gearvault-api.vercel.app/health
+
+Authentication, instrument management, and public catalog endpoints are available.
+
+Final security and authorization checks remain pending.
 
 ## Technologies
 
@@ -504,41 +512,40 @@ These commands check both frontend and backend.
 
 ## Deployment
 
-The backend is prepared for deployment on Vercel.
+The backend is deployed on Vercel.
 
-A protected Preview deployment has been used to verify that the Express application starts successfully and connects to MongoDB Atlas.
+Production API:
 
-### Production Configuration
+https://gearvault-api.vercel.app
 
-Production deployment requires:
+Health endpoint:
 
-- A valid MongoDB Atlas connection string.
-- A strong JWT secret.
-- The correct production frontend origin in CLIENT_URL.
-- Appropriate MongoDB network access.
-- Verification that sensitive environment values are not exposed publicly.
+https://gearvault-api.vercel.app/health
 
-### Production Verification
+The application uses MongoDB Atlas and environment variables configured directly in Vercel.
 
-After deployment, verify:
+### Production Environment
 
-1. API health check.
-2. Registration and login.
-3. JWT validation.
-4. Personal collection operations.
-5. Ownership restrictions.
-6. Public Explore endpoints.
-7. Authentication rate limiting.
-8. Requests from the deployed React frontend.
+- MONGO_URI — MongoDB Atlas connection string.
+- JWT_SECRET — JWT signing secret.
+- CLIENT_URL — https://gearvault-olive.vercel.app
 
-The final production API URL will be documented after deployment and verification.
+Sensitive credentials must remain private and must not be committed to GitHub.
+
+### Verification
+
+The production health endpoint has returned HTTP 200.
+
+Frontend authentication and collection operations have been tested against the deployed API.
+
+Additional authorization, request-validation, and rate-limiting tests remain part of the final review.
 
 ## Current Limitations
 
 - Direct image uploads are not implemented.
 - Automatic serial-number decoding is not supported.
 - Trading and advanced community features are planned for future releases.
-- Final production deployment and end-to-end verification remain pending.
+- Final security checks and submission review remain pending.
 
 ## Related Documentation
 

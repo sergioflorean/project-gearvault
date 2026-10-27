@@ -8,15 +8,16 @@ Built as a Software Engineering capstone project for TripleTen, GearVault combin
 
 ## Project Status
 
-**Stage 2 — Full-Stack Development Complete · Final Production Release Pending**
+**Stage 2 — Full-Stack Application Live**
 
-The Stage 2 application has been implemented and tested locally. Registration, authentication, instrument management, and the public catalog use a real backend and database. Frontend and backend lint and build checks pass.
+GearVault is deployed on Vercel with React, Express, and MongoDB Atlas. Registration, login, Explore, and personal collection management have been tested through the public application.
 
-- **Live demo (Stage 1):** https://gearvault-olive.vercel.app
-- **Current development branch (Stage 2):** stage-fullstack
-- **Final Stage 2 deployment:** Pending production configuration and end-to-end testing
+- **Frontend:** https://gearvault-olive.vercel.app
+- **Backend API:** https://gearvault-api.vercel.app
+- **API health check:** https://gearvault-api.vercel.app/health
+- **Release branch:** stage-fullstack
 
-The public demo currently represents Stage 1. The full-stack version is available in the stage-fullstack branch.
+Final security checks and TripleTen submission are pending.
 
 ## Features
 
@@ -322,34 +323,27 @@ For more information, see docs/reverb-api.md.
 
 ## Deployment Status
 
-### Stage 1 Frontend
-
-The original frontend application is publicly available on Vercel.
+### Frontend — Production
 
 https://gearvault-olive.vercel.app
 
-This deployment represents the Stage 1 version.
+The React application is deployed on Vercel from the stage-fullstack branch. The project uses client/ as its root directory.
 
-### Stage 2 Backend
+The production VITE_API_URL points to https://gearvault-api.vercel.app.
 
-The Express API has been deployed to a protected Vercel Preview environment.
+### Backend — Production
 
-The health endpoint has successfully returned HTTP 200, confirming that the application was able to start and establish a database connection during verification.
+https://gearvault-api.vercel.app
 
-### Stage 2 Production Release
+The Express API is deployed on Vercel and connected to MongoDB Atlas.
 
-Final production deployment remains pending.
+Production environment variables include MONGO_URI, JWT_SECRET, and CLIENT_URL.
 
-The remaining tasks include:
+The health endpoint has returned HTTP 200.
 
-- Production environment variable configuration.
-- MongoDB Atlas connectivity verification.
-- Production CORS configuration.
-- Deployment of the Stage 2 React frontend.
-- Authentication and CRUD testing through public URLs.
-- Final security and functionality verification.
+### Final Verification
 
-Production URLs and final deployment instructions will be added after verification.
+The frontend and backend have been tested together in production. Final authorization, validation, and rate-limiting checks remain pending.
 
 ## Current Limitations
 
@@ -358,7 +352,6 @@ Production URLs and final deployment instructions will be added after verificati
 - Wantlists, trading, and public user profiles are reserved for future development.
 - Tone Hunter remains a planned feature.
 - Market price references are based on active listings rather than completed sales.
-- The Stage 2 production release has not yet completed final verification.
 
 These limitations are outside the current mandatory Stage 2 scope.
 
@@ -373,7 +366,7 @@ These limitations are outside the current mandatory Stage 2 scope.
 - Market price references.
 - Initial public deployment on Vercel.
 
-### Stage 2 — Implemented
+### Stage 2 — Deployed
 
 - Express REST API with TypeScript.
 - MongoDB Atlas database integration.
@@ -388,15 +381,12 @@ These limitations are outside the current mandatory Stage 2 scope.
 - Success notifications for instrument operations.
 - Frontend and backend lint and build verification.
 
-### Final Release — Pending
+### Final Review — Pending
 
-- Configure production environment variables and CORS.
-- Deploy the Stage 2 frontend and API.
-- Verify authentication and CRUD operations from public URLs.
-- Complete authorization, validation, and security testing.
-- Update documentation with final production URLs.
-- Create the final pull request.
-- Submit the Stage 2 project for review.
+- Run final frontend and backend lint and build checks.
+- Complete production security and authorization tests.
+- Create the final pull request from stage-fullstack to main.
+- Submit the pull request link to TripleTen.
 
 ### Future Improvements
 

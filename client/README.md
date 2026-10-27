@@ -10,17 +10,17 @@ This application is part of the GearVault full-stack capstone project for the Tr
 
 ## Current Status
 
-**Stage 2 — Full-Stack Frontend Implemented**
+**Stage 2 — Full-Stack Frontend Live**
 
-The frontend includes user authentication, protected collection management, public instrument browsing, and Reverb marketplace integration.
+The frontend is deployed on Vercel and connected to the GearVault Express API.
 
-Local development and functionality checks have been completed. Final production deployment and verification are pending.
-
-The public Stage 1 application remains available at:
+Production URL:
 
 https://gearvault-olive.vercel.app
 
-The current full-stack implementation is maintained in the stage-fullstack branch.
+Authentication, Explore, and personal collection management have been tested through the public application.
+
+Final security checks and project submission remain pending.
 
 ## Technologies
 
@@ -352,19 +352,21 @@ Verify that navigation, instrument cards, forms, and controls remain usable with
 
 ## Deployment
 
-The frontend is configured for deployment on Vercel.
+The React application is deployed on Vercel.
 
-The project includes client/vercel.json to support React Router navigation.
-
-Stage 1 is publicly available at:
+Production URL:
 
 https://gearvault-olive.vercel.app
 
-The Stage 2 frontend has not yet completed its final production deployment.
+Production API:
 
-Production configuration requires VITE_API_URL to point to the deployed backend.
+https://gearvault-api.vercel.app
 
-After deployment, authentication, public catalog requests, and instrument CRUD operations must be verified through the public application URL.
+The deployment uses the stage-fullstack branch and the client/ root directory.
+
+VITE_API_URL is configured to point to the production backend.
+
+React Router navigation is supported through client/vercel.json.
 
 ## Current Limitations
 
@@ -373,7 +375,6 @@ After deployment, authentication, public catalog requests, and instrument CRUD o
 - Tone Hunter is reserved for future development.
 - Automatic serial-number identification is not available.
 - Reverb price references depend on active third-party listings.
-- Final Stage 2 production deployment and verification are pending.
 
 ## Related Documentation
 
