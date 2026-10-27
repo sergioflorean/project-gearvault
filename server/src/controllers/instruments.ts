@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import Instrument from "../models/instrument.js";
 import mongoose from "mongoose";
+import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../config/constants.js";
 
 export const getInstruments = async (_req: Request, res: Response) => {
   const instruments = await Instrument.find({
@@ -11,6 +12,12 @@ export const getInstruments = async (_req: Request, res: Response) => {
 };
 
 export const createInstrument = async (req: Request, res: Response) => {
+  if (!req.body || typeof req.body !== "object" || Array.isArray(req.body)) {
+    res.status(400).json({
+      message: ERROR_MESSAGES.INVALID_REQUEST_BODY,
+    });
+    return;
+  }
   const {
     brand,
     model,
@@ -25,7 +32,7 @@ export const createInstrument = async (req: Request, res: Response) => {
 
   if (!brand || !model || !category) {
     res.status(400).json({
-      message: "Brand, model, and category are required",
+      message: ERROR_MESSAGES.INSTRUMENT_REQUIRED,
     });
     return;
   }
@@ -39,7 +46,7 @@ export const createInstrument = async (req: Request, res: Response) => {
     (category !== "guitar" && category !== "amp" && category !== "pedal")
   ) {
     res.status(400).json({
-      message: "Invalid instrument data",
+      message: ERROR_MESSAGES.INVALID_INSTRUMENT_DATA,
     });
     return;
   }
@@ -64,7 +71,7 @@ export const createInstrument = async (req: Request, res: Response) => {
   } catch (err: unknown) {
     if (err instanceof mongoose.Error.ValidationError) {
       res.status(400).json({
-        message: "Invalid instrument data",
+        message: ERROR_MESSAGES.INVALID_INSTRUMENT_DATA,
       });
       return;
     }
@@ -78,7 +85,7 @@ export const getInstrumentById = async (req: Request, res: Response) => {
 
   if (typeof id !== "string" || !mongoose.isValidObjectId(id)) {
     res.status(400).json({
-      message: "Invalid instrument ID",
+      message: ERROR_MESSAGES.INVALID_INSTRUMENT_ID,
     });
     return;
   }
@@ -90,7 +97,7 @@ export const getInstrumentById = async (req: Request, res: Response) => {
 
   if (!instrument) {
     res.status(404).json({
-      message: "Instrument not found",
+      message: ERROR_MESSAGES.INSTRUMENT_NOT_FOUND,
     });
     return;
   }
@@ -103,14 +110,14 @@ export const updateInstrument = async (req: Request, res: Response) => {
 
   if (typeof id !== "string" || !mongoose.isValidObjectId(id)) {
     res.status(400).json({
-      message: "Invalid instrument ID",
+      message: ERROR_MESSAGES.INVALID_INSTRUMENT_ID,
     });
     return;
   }
 
   if (!req.body || typeof req.body !== "object" || Array.isArray(req.body)) {
     res.status(400).json({
-      message: "Invalid request body",
+      message: ERROR_MESSAGES.INVALID_REQUEST_BODY,
     });
     return;
   }
@@ -137,7 +144,7 @@ export const updateInstrument = async (req: Request, res: Response) => {
 
   if (Object.keys(updates).length === 0) {
     res.status(400).json({
-      message: "No valid fields to update",
+      message: ERROR_MESSAGES.NO_VALID_FIELDS,
     });
     return;
   }
@@ -157,7 +164,7 @@ export const updateInstrument = async (req: Request, res: Response) => {
 
     if (!instrument) {
       res.status(404).json({
-        message: "Instrument not found",
+        message: ERROR_MESSAGES.INSTRUMENT_NOT_FOUND,
       });
       return;
     }
@@ -169,7 +176,7 @@ export const updateInstrument = async (req: Request, res: Response) => {
       err instanceof mongoose.Error.CastError
     ) {
       res.status(400).json({
-        message: "Invalid instrument data",
+        message: ERROR_MESSAGES.INVALID_INSTRUMENT_DATA,
       });
       return;
     }
@@ -183,19 +190,23 @@ export const deleteInstrument = async (req: Request, res: Response) => {
 
   if (typeof id !== "string" || !mongoose.isValidObjectId(id)) {
     res.status(400).json({
-      message: "Invalid instrument ID",
+      message: ERROR_MESSAGES.INVALID_INSTRUMENT_ID,
     });
     return;
   }
 
-  const instrument = await Instrument.findOne({
-    _id: id,
-    owner: req.user?.userId,
-  });
+  const instrument = await Instrument.findById(id);
 
   if (!instrument) {
     res.status(404).json({
-      message: "Instrument not found",
+      message: ERROR_MESSAGES.INSTRUMENT_NOT_FOUND,
+    });
+    return;
+  }
+
+  if (String(instrument.owner) !== req.user?.userId) {
+    res.status(403).json({
+      message: ERROR_MESSAGES.INSTRUMENT_DELETE_FORBIDDEN,
     });
     return;
   }
@@ -203,7 +214,7 @@ export const deleteInstrument = async (req: Request, res: Response) => {
   await instrument.deleteOne();
 
   res.status(200).json({
-    message: "Instrument deleted successfully",
+    message: SUCCESS_MESSAGES.INSTRUMENT_DELETED,
   });
 };
 
@@ -220,7 +231,7 @@ export const getPublicInstrumentById = async (req: Request, res: Response) => {
 
   if (typeof id !== "string" || !mongoose.isValidObjectId(id)) {
     res.status(400).json({
-      message: "Invalid instrument ID",
+      message: ERROR_MESSAGES.INVALID_INSTRUMENT_ID,
     });
     return;
   }
@@ -231,7 +242,7 @@ export const getPublicInstrumentById = async (req: Request, res: Response) => {
 
   if (!instrument) {
     res.status(404).json({
-      message: "Instrument not found",
+      message: ERROR_MESSAGES.INSTRUMENT_NOT_FOUND,
     });
     return;
   }

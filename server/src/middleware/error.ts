@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
+import { ERROR_MESSAGES } from "../config/constants.js";
 
 export const notFoundHandler = (req: Request, res: Response) => {
   res.status(404).json({
@@ -24,7 +25,7 @@ export const errorHandler = (
     "body" in err
   ) {
     res.status(400).json({
-      message: "Invalid JSON body",
+      message: ERROR_MESSAGES.INVALID_JSON_BODY,
     });
     return;
   }
@@ -32,6 +33,6 @@ export const errorHandler = (
   console.error(err);
 
   res.status(500).json({
-    message: "Internal server error",
+    message: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
   });
 };

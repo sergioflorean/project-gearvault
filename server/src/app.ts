@@ -2,12 +2,14 @@ import "dotenv/config";
 
 import express from "express";
 import mongoose from "mongoose";
-import authRoutes from "./routes/auth.js";
+
 import { notFoundHandler, errorHandler } from "./middleware/error.js";
-import instrumentRoutes from "./routes/instruments.js";
+import routes from "./routes/index.js";
 import cors from "cors";
 
 const app = express();
+app.set("trust proxy", 1);
+
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:5173",
@@ -15,8 +17,7 @@ app.use(
 );
 
 app.use(express.json());
-app.use(authRoutes);
-app.use(instrumentRoutes);
+app.use(routes);
 
 app.get("/health", (_req, res) => {
   res.status(200).json({

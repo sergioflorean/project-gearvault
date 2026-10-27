@@ -1,12 +1,13 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { ERROR_MESSAGES } from "../config/constants.js";
 
 export const auth = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     res.status(401).json({
-      message: "Authorization token required",
+      message: ERROR_MESSAGES.AUTH_TOKEN_REQUIRED,
     });
     return;
   }
@@ -23,7 +24,7 @@ export const auth = (req: Request, res: Response, next: NextFunction) => {
     next();
   } catch {
     res.status(401).json({
-      message: "Invalid or expired token",
+      message: ERROR_MESSAGES.INVALID_OR_EXPIRED_TOKEN,
     });
   }
 };

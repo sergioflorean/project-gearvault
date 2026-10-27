@@ -2,15 +2,22 @@ import type { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import User from "../models/user.js";
+import { ERROR_MESSAGES } from "../config/constants.js";
 
 import jwt from "jsonwebtoken";
 
 export const register = async (req: Request, res: Response) => {
+  if (!req.body || typeof req.body !== "object" || Array.isArray(req.body)) {
+    res.status(400).json({
+      message: ERROR_MESSAGES.INVALID_REQUEST_BODY,
+    });
+    return;
+  }
   const { email, password, name } = req.body;
 
   if (!email || !password || !name) {
     res.status(400).json({
-      message: "Email, password, and name are required",
+      message: ERROR_MESSAGES.SIGNUP_REQUIRED,
     });
     return;
   }
@@ -21,21 +28,21 @@ export const register = async (req: Request, res: Response) => {
     typeof name !== "string"
   ) {
     res.status(400).json({
-      message: "Email, password, and name must be strings",
+      message: ERROR_MESSAGES.SIGNUP_INVALID_TYPES,
     });
     return;
   }
 
   if (!email.trim() || !name.trim()) {
     res.status(400).json({
-      message: "Email and name cannot be empty",
+      message: ERROR_MESSAGES.SIGNUP_EMPTY_FIELDS,
     });
     return;
   }
 
   if (password.length < 8) {
     res.status(400).json({
-      message: "Password must be at least 8 characters",
+      message: ERROR_MESSAGES.PASSWORD_TOO_SHORT,
     });
     return;
   }
@@ -57,14 +64,14 @@ export const register = async (req: Request, res: Response) => {
   } catch (err: unknown) {
     if (err instanceof mongoose.mongo.MongoServerError && err.code === 11000) {
       res.status(409).json({
-        message: "Email already registered",
+        message: ERROR_MESSAGES.EMAIL_ALREADY_REGISTERED,
       });
       return;
     }
 
     if (err instanceof mongoose.Error.ValidationError) {
       res.status(400).json({
-        message: "Invalid user data",
+        message: ERROR_MESSAGES.INVALID_USER_DATA,
       });
       return;
     }
@@ -74,18 +81,24 @@ export const register = async (req: Request, res: Response) => {
 };
 
 export const login = async (req: Request, res: Response) => {
+  if (!req.body || typeof req.body !== "object" || Array.isArray(req.body)) {
+    res.status(400).json({
+      message: ERROR_MESSAGES.INVALID_REQUEST_BODY,
+    });
+    return;
+  }
   const { email, password } = req.body;
 
   if (!email || !password) {
     res.status(400).json({
-      message: "Email and password are required",
+      message: ERROR_MESSAGES.SIGNIN_REQUIRED,
     });
     return;
   }
 
   if (typeof email !== "string" || typeof password !== "string") {
     res.status(400).json({
-      message: "Email and password must be strings",
+      message: ERROR_MESSAGES.SIGNIN_INVALID_TYPES,
     });
     return;
   }
@@ -94,7 +107,7 @@ export const login = async (req: Request, res: Response) => {
 
   if (!user) {
     res.status(401).json({
-      message: "Invalid credentials",
+      message: ERROR_MESSAGES.INVALID_CREDENTIALS,
     });
     return;
   }
@@ -103,7 +116,7 @@ export const login = async (req: Request, res: Response) => {
 
   if (!isMatch) {
     res.status(401).json({
-      message: "Invalid credentials",
+      message: ERROR_MESSAGES.INVALID_CREDENTIALS,
     });
     return;
   }
@@ -129,7 +142,7 @@ export const getProfile = async (req: Request, res: Response) => {
 
   if (!user) {
     res.status(404).json({
-      message: "User not found",
+      message: ERROR_MESSAGES.USER_NOT_FOUND,
     });
     return;
   }

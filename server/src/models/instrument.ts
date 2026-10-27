@@ -24,6 +24,8 @@ const instrumentSchema = new Schema(
     },
     year: {
       type: Number,
+      min: 1900,
+      max: new Date().getFullYear(),
     },
     finish: {
       type: String,
@@ -35,6 +37,20 @@ const instrumentSchema = new Schema(
     },
     imageUrl: {
       type: String,
+      trim: true,
+      validate: {
+        validator: (value: string) => {
+          if (!value) return true;
+
+          try {
+            const url = new URL(value);
+            return url.protocol === "http:" || url.protocol === "https:";
+          } catch {
+            return false;
+          }
+        },
+        message: "Image URL must be a valid HTTP or HTTPS URL",
+      },
     },
     photoUrls: {
       type: [String],
