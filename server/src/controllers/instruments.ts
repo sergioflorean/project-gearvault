@@ -218,12 +218,29 @@ export const deleteInstrument = async (req: Request, res: Response) => {
   });
 };
 
+const PUBLIC_INSTRUMENT_FIELDS =
+  "brand model category year finish imageUrl availability addedAt owner";
+
 export const getPublicInstruments = async (_req: Request, res: Response) => {
   const instruments = await Instrument.find()
-    .select("brand model category year finish imageUrl availability addedAt")
+    .select(PUBLIC_INSTRUMENT_FIELDS)
+    .populate<{ owner: { name: string } | null }>("owner", "name -_id")
     .sort({ createdAt: -1 });
 
-  res.status(200).json({ instruments });
+  res.status(200).json({
+    instruments: instruments.map((item) => ({
+      _id: item._id,
+      brand: item.brand,
+      model: item.model,
+      category: item.category,
+      year: item.year,
+      finish: item.finish,
+      imageUrl: item.imageUrl,
+      availability: item.availability,
+      addedAt: item.addedAt,
+      ownerName: item.owner?.name ?? "Unknown user",
+    })),
+  });
 };
 
 export const getPublicInstrumentById = async (req: Request, res: Response) => {
@@ -236,16 +253,29 @@ export const getPublicInstrumentById = async (req: Request, res: Response) => {
     return;
   }
 
-  const instrument = await Instrument.findById(id).select(
-    "brand model category year finish imageUrl availability addedAt",
-  );
+  const item = await Instrument.findById(id)
+    .select(PUBLIC_INSTRUMENT_FIELDS)
+    .populate<{ owner: { name: string } | null }>("owner", "name -_id");
 
-  if (!instrument) {
+  if (!item) {
     res.status(404).json({
       message: ERROR_MESSAGES.INSTRUMENT_NOT_FOUND,
     });
     return;
   }
 
-  res.status(200).json({ instrument });
+  res.status(200).json({
+    instrument: {
+      _id: item._id,
+      brand: item.brand,
+      model: item.model,
+      category: item.category,
+      year: item.year,
+      finish: item.finish,
+      imageUrl: item.imageUrl,
+      availability: item.availability,
+      addedAt: item.addedAt,
+      ownerName: item.owner?.name ?? "Unknown user",
+    },
+  });
 };

@@ -1,9 +1,9 @@
-import { Button, Stack } from "@mui/material";
+import { Button, Stack, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 const Navigation = () => {
-  const { token, signOut } = useAuth();
+  const { token, user, signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = () => {
@@ -29,6 +29,19 @@ const Navigation = () => {
       <Button component={Link} to="/about" color="inherit">
         About
       </Button>
+      {token && user && (
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{
+            alignSelf: "center",
+            px: 1,
+            overflowWrap: "anywhere",
+          }}
+        >
+          {user.name}
+        </Typography>
+      )}
       {token ? (
         <Button onClick={handleSignOut} variant="contained">
           Sign Out

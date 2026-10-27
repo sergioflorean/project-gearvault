@@ -10,6 +10,8 @@ interface GearCardProps {
 }
 
 const GearCard = ({ gear, source = "explore" }: GearCardProps) => {
+  const ownerName = source === "explore" ? gear.ownerName : undefined;
+
   return (
     <Box
       component="article"
@@ -166,6 +168,11 @@ const GearCard = ({ gear, source = "explore" }: GearCardProps) => {
           <Box>
             <AvailabilityBadge availability={gear.availability} />
           </Box>
+          {ownerName && (
+            <Typography variant="body2" color="text.secondary" sx={{ overflowWrap: "anywhere" }}>
+              Owned by {ownerName}
+            </Typography>
+          )}
         </Stack>
       </Box>
     </Box>

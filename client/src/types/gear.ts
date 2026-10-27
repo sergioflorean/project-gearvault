@@ -9,6 +9,7 @@ export interface GearPreview {
   finish?: string;
   imageUrl?: string;
   availability: GearAvailability;
+  ownerName?: string;
   identification?: GearIdentification;
 }
 
