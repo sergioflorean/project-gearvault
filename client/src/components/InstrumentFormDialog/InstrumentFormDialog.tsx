@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 import {
+  Alert,
   Button,
   Dialog,
   DialogActions,
@@ -18,6 +19,8 @@ interface InstrumentFormDialogProps {
   onClose: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onDelete?: (id: string) => void;
+  isSubmitting?: boolean;
+  error?: string;
 }
 
 const InstrumentFormDialog = ({
@@ -26,6 +29,8 @@ const InstrumentFormDialog = ({
   onClose,
   onSubmit,
   onDelete,
+  isSubmitting = false,
+  error,
 }: InstrumentFormDialogProps) => {
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -42,6 +47,8 @@ const InstrumentFormDialog = ({
           sx={{ pt: 1 }}
           onSubmit={onSubmit}
         >
+          {error && <Alert severity="error">{error}</Alert>}
+
           <TextField
             name="brand"
             label="Brand"
@@ -122,6 +129,7 @@ const InstrumentFormDialog = ({
             type="button"
             size="small"
             color="error"
+            disabled={isSubmitting}
             onClick={() => onDelete(instrument.id)}
             sx={{ mr: "auto", textTransform: "none" }}
           >
@@ -129,10 +137,21 @@ const InstrumentFormDialog = ({
           </Button>
         )}
 
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose} disabled={isSubmitting}>
+          Cancel
+        </Button>
 
-        <Button variant="contained" type="submit" form="instrument-form">
-          {instrument ? "Save Changes" : "Save Instrument"}
+        <Button
+          variant="contained"
+          type="submit"
+          form="instrument-form"
+          disabled={isSubmitting}
+        >
+          {isSubmitting
+            ? "Saving..."
+            : instrument
+              ? "Save Changes"
+              : "Save Instrument"}
         </Button>
       </DialogActions>
     </Dialog>

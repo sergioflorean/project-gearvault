@@ -1,17 +1,56 @@
-import { useState, type FormEvent } from "react";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { useEffect, useState, type FormEvent } from "react";
+import { Alert, Box, Button, Stack, Typography } from "@mui/material";
 import Main from "../../components/Main/Main";
 import GearCard from "../../components/GearCard/GearCard";
 import InstrumentFormDialog from "../../components/InstrumentFormDialog/InstrumentFormDialog";
 
+import { useAuth } from "../../context/AuthContext";
+import { createInstrument, getMyInstruments } from "../../utils/instrumentsApi";
+
 import type { CollectionItem } from "../../types/collection";
 
-import { loadCollection, saveCollection } from "../../utils/collectionStorage";
-
 const MyCollection = () => {
+  const { token } = useAuth();
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [collection, setCollection] =
-    useState<CollectionItem[]>(loadCollection);
+  const [collection, setCollection] = useState<CollectionItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+
+  useEffect(() => {
+    if (!token) return;
+
+    let isActive = true;
+
+    const loadInstruments = async () => {
+      try {
+        const instruments = await getMyInstruments(token);
+
+        if (isActive) {
+          setCollection(instruments);
+        }
+      } catch (err: unknown) {
+        if (isActive) {
+          setLoadError(
+            err instanceof Error ? err.message : "Could not load instruments.",
+          );
+        }
+      } finally {
+        if (isActive) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadInstruments();
+
+    return () => {
+      isActive = false;
+    };
+  }, [token]);
 
   const collectionStats = {
     total: collection.length,
@@ -27,8 +66,10 @@ const MyCollection = () => {
     (a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime(),
   );
 
-  const handleAddInstrument = (event: FormEvent<HTMLFormElement>) => {
+  const handleAddInstrument = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (!token || isSaving) return;
 
     const formData = new FormData(event.currentTarget);
 
@@ -38,31 +79,34 @@ const MyCollection = () => {
     if (!brand || !model) return;
 
     const yearValue = String(formData.get("year") ?? "").trim();
-    const finish = String(formData.get("finish") ?? "").trim();
-    const serialNumber = String(formData.get("serialNumber") ?? "").trim();
-    const imageUrl = String(formData.get("imageUrl") ?? "").trim();
 
-    const newInstrument: CollectionItem = {
-      id: crypto.randomUUID(),
-      brand,
-      model,
-      category: formData.get("category") as CollectionItem["category"],
-      year: yearValue ? Number(yearValue) : undefined,
-      finish: finish || undefined,
-      serialNumber: serialNumber || undefined,
-      imageUrl: imageUrl || undefined,
-      availability: formData.get(
-        "availability",
-      ) as CollectionItem["availability"],
-      addedAt: new Date().toISOString(),
-    };
+    setIsSaving(true);
+    setSaveError("");
 
-    const updatedCollection = [...collection, newInstrument];
+    try {
+      const savedInstrument = await createInstrument(token, {
+        brand,
+        model,
+        category: formData.get("category") as CollectionItem["category"],
+        year: yearValue ? Number(yearValue) : undefined,
+        finish: String(formData.get("finish") ?? "").trim() || undefined,
+        serialNumber:
+          String(formData.get("serialNumber") ?? "").trim() || undefined,
+        imageUrl: String(formData.get("imageUrl") ?? "").trim() || undefined,
+        availability: formData.get(
+          "availability",
+        ) as CollectionItem["availability"],
+      });
 
-    saveCollection(updatedCollection);
-    setCollection(updatedCollection);
-
-    setIsDialogOpen(false);
+      setCollection((current) => [savedInstrument, ...current]);
+      setIsDialogOpen(false);
+    } catch (err: unknown) {
+      setSaveError(
+        err instanceof Error ? err.message : "Could not save instrument.",
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -89,9 +133,11 @@ const MyCollection = () => {
           <Button
             variant="contained"
             onClick={() => {
+              setSaveError("");
               setIsDialogOpen(true);
             }}
             sx={{ textTransform: "none" }}
+            disabled={isSaving}
           >
             Add Instrument
           </Button>
@@ -141,7 +187,13 @@ const MyCollection = () => {
             ))}
         </Box>
 
-        {collection.length === 0 ? (
+        {isLoading ? (
+          <Typography color="text.secondary">
+            Loading your collection...
+          </Typography>
+        ) : loadError ? (
+          <Alert severity="error">{loadError}</Alert>
+        ) : collection.length === 0 ? (
           <Box
             sx={{
               border: 1,
@@ -185,6 +237,8 @@ const MyCollection = () => {
         instrument={null}
         onClose={() => setIsDialogOpen(false)}
         onSubmit={handleAddInstrument}
+        isSubmitting={isSaving}
+        error={saveError}
       />
     </Main>
   );

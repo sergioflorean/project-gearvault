@@ -6,11 +6,12 @@ import {
   Button,
   Menu,
   MenuItem,
+  Alert,
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { useParams, Link, useLocation, useNavigate } from "react-router-dom";
 import Main from "../../components/Main/Main";
-import { getExploreGear } from "../../utils/exploreGear";
+import { mockGear } from "../../utils/mockGear";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import AvailabilityBadge from "../../components/AvailabilityBadge/AvailabilityBadge";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -19,18 +20,29 @@ import { useEffect, useState, useMemo, type FormEvent } from "react";
 import { fetchReverbListings } from "../../utils/reverbApi";
 import { mapReverbListingsToMarketData } from "../../utils/reverbMapper";
 import {
-  loadCollection,
-  saveCollection,
-  updateCollectionItem,
-} from "../../utils/collectionStorage";
+  getInstrumentById,
+  updateInstrument,
+  deleteInstrument,
+} from "../../utils/instrumentsApi";
 import InstrumentFormDialog from "../../components/InstrumentFormDialog/InstrumentFormDialog";
+
+import { useAuth } from "../../context/AuthContext";
+
 import type { CollectionItem } from "../../types/collection";
 import type { GearMarketData } from "../../types/gear";
+
 const GearDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const fromCollection = location.state?.fromCollection === true;
+  const { token } = useAuth();
+
+  const [collectionGear, setCollectionGear] = useState<CollectionItem | null>(
+    null,
+  );
+  const [detailError, setDetailError] = useState("");
+
   const [marketResult, setMarketResult] = useState<{
     gearId: string;
     status: "success" | "error";
@@ -41,15 +53,57 @@ const GearDetail = () => {
   }, [id]);
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [editError, setEditError] = useState("");
   const [updatedGear, setUpdatedGear] = useState<CollectionItem | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+
   const originalGear = useMemo(
-    () => getExploreGear().find((item) => item.id === id),
+    () => mockGear.find((item) => item.id === id),
     [id],
   );
-  const gear = updatedGear?.id === id ? updatedGear : originalGear;
-  const isOwner = loadCollection().some(
-    (instrument) => instrument.id === gear?.id,
+
+  const gear =
+    updatedGear?.id === id
+      ? updatedGear
+      : collectionGear?.id === id
+        ? collectionGear
+        : originalGear;
+
+  useEffect(() => {
+    if (!id || !token || originalGear) return;
+
+    let isActive = true;
+
+    const loadInstrument = async () => {
+      try {
+        const instrument = await getInstrumentById(token, id);
+
+        if (isActive) {
+          setCollectionGear(instrument);
+          setDetailError("");
+        }
+      } catch (err: unknown) {
+        if (isActive) {
+          setDetailError(
+            err instanceof Error ? err.message : "Could not load instrument.",
+          );
+        }
+      }
+    };
+
+    void loadInstrument();
+
+    return () => {
+      isActive = false;
+    };
+  }, [id, token, originalGear]);
+
+  const isOwner = Boolean(
+    token && collectionGear && gear?.id === collectionGear.id,
   );
+
   const marketStatus =
     gear && marketResult && marketResult.gearId === gear.id
       ? marketResult.status
@@ -108,48 +162,88 @@ const GearDetail = () => {
     }
   };
 
-  const handleSaveInstrument = (event: FormEvent<HTMLFormElement>) => {
+  const handleSaveInstrument = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!gear || !isOwner) return;
+
+    if (!gear || !isOwner || !token || isSaving) return;
+
     const formData = new FormData(event.currentTarget);
+
     const brand = String(formData.get("brand") ?? "").trim();
     const model = String(formData.get("model") ?? "").trim();
+
     if (!brand || !model) return;
+
     const yearValue = String(formData.get("year") ?? "").trim();
-    const updated = updateCollectionItem(gear.id, {
-      brand,
-      model,
-      category: formData.get("category") as CollectionItem["category"],
-      year: yearValue ? Number(yearValue) : undefined,
-      finish: String(formData.get("finish") ?? "").trim() || undefined,
-      serialNumber:
-        String(formData.get("serialNumber") ?? "").trim() || undefined,
-      imageUrl: String(formData.get("imageUrl") ?? "").trim() || undefined,
-      availability: formData.get(
-        "availability",
-      ) as CollectionItem["availability"],
-    });
-    if (!updated) return;
-    setUpdatedGear(updated);
-    setIsEditDialogOpen(false);
+
+    setIsSaving(true);
+    setEditError("");
+
+    try {
+      const updatedInstrument = await updateInstrument(token, gear.id, {
+        brand,
+        model,
+        category: formData.get("category") as CollectionItem["category"],
+        year: yearValue ? Number(yearValue) : undefined,
+        finish: String(formData.get("finish") ?? "").trim() || undefined,
+        serialNumber:
+          String(formData.get("serialNumber") ?? "").trim() || undefined,
+        imageUrl: String(formData.get("imageUrl") ?? "").trim() || undefined,
+        availability: formData.get(
+          "availability",
+        ) as CollectionItem["availability"],
+      });
+
+      setCollectionGear(updatedInstrument);
+      setUpdatedGear(updatedInstrument);
+      setIsEditDialogOpen(false);
+    } catch (err: unknown) {
+      setEditError(
+        err instanceof Error ? err.message : "Could not update instrument.",
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleDeleteInstrument = (instrumentId: string) => {
-    if (!isOwner || gear?.id !== instrumentId) return;
+  const handleDeleteInstrument = async (instrumentId: string) => {
+    if (!token || !isOwner || gear?.id !== instrumentId || isDeleting) {
+      return;
+    }
+
     const confirmed = window.confirm(
       "Remove this instrument from your collection?",
     );
+
     if (!confirmed) return;
-    const updatedCollection = loadCollection().filter(
-      (instrument) => instrument.id !== instrumentId,
-    );
-    saveCollection(updatedCollection);
-    setIsEditDialogOpen(false);
-    navigate("/my-collection");
+
+    setIsDeleting(true);
+    setDeleteError("");
+
+    try {
+      await deleteInstrument(token, instrumentId);
+
+      navigate("/my-collection");
+    } catch (err: unknown) {
+      setDeleteError(
+        err instanceof Error ? err.message : "Could not delete instrument.",
+      );
+    } finally {
+      setIsDeleting(false);
+    }
   };
+
+  const isLoadingDetail = Boolean(
+    id && token && !originalGear && !gear && !detailError,
+  );
+
   return (
     <Main>
-      {gear ? (
+      {isLoadingDetail ? (
+        <Typography color="text.secondary">Loading instrument...</Typography>
+      ) : detailError ? (
+        <Typography color="error">{detailError}</Typography>
+      ) : gear ? (
         <Stack spacing={4}>
           <Box
             sx={{
@@ -160,6 +254,9 @@ const GearDetail = () => {
               gap: 2,
             }}
           >
+            {deleteError && !isEditDialogOpen && (
+              <Alert severity="error">{deleteError}</Alert>
+            )}
             <Button
               onClick={handleBack}
               variant="text"
@@ -203,6 +300,7 @@ const GearDetail = () => {
                     Edit
                   </MenuItem>
                   <MenuItem
+                    disabled={isDeleting || isSaving}
                     onClick={() => {
                       setMenuAnchor(null);
                       handleDeleteInstrument(gear.id);
@@ -462,14 +560,15 @@ const GearDetail = () => {
           {isOwner && (
             <InstrumentFormDialog
               open={isEditDialogOpen}
-              instrument={
-                loadCollection().find(
-                  (instrument) => instrument.id === gear.id,
-                ) ?? null
-              }
-              onClose={() => setIsEditDialogOpen(false)}
+              instrument={collectionGear}
+              onClose={() => {
+                setIsEditDialogOpen(false);
+                setEditError("");
+              }}
               onSubmit={handleSaveInstrument}
               onDelete={handleDeleteInstrument}
+              isSubmitting={isSaving || isDeleting}
+              error={editError || deleteError}
             />
           )}
         </Stack>
