@@ -15,10 +15,10 @@ export type AuthContextValue = {
   signOut: () => void;
 };
 
-export const AuthContext = createContext<AuthContextValue | null>(null);
+export const CurrentUserContext = createContext<AuthContextValue | null>(null);
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
+  const context = useContext(CurrentUserContext);
 
   if (!context) {
     throw new Error("useAuth must be used within AuthProvider");

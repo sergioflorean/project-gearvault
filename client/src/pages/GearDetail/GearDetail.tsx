@@ -7,6 +7,7 @@ import {
   Menu,
   MenuItem,
   Alert,
+  Snackbar,
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { useParams, Link, useLocation, useNavigate } from "react-router-dom";
@@ -64,7 +65,7 @@ const GearDetail = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editError, setEditError] = useState("");
-
+  const [successMessage, setSuccessMessage] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
@@ -232,6 +233,7 @@ const GearDetail = () => {
 
       setOwnedGear({ token, instrument: updatedInstrument });
       setIsEditDialogOpen(false);
+      setSuccessMessage("Instrument updated successfully.");
     } catch (err: unknown) {
       setEditError(
         err instanceof Error ? err.message : "Could not update instrument.",
@@ -258,7 +260,11 @@ const GearDetail = () => {
     try {
       await deleteInstrument(token, instrumentId);
 
-      navigate("/my-collection");
+      navigate("/my-collection", {
+        state: {
+          successMessage: "Instrument deleted successfully.",
+        },
+      });
     } catch (err: unknown) {
       setDeleteError(
         err instanceof Error ? err.message : "Could not delete instrument.",
@@ -627,6 +633,20 @@ const GearDetail = () => {
           </Button>
         </Stack>
       )}
+      <Snackbar
+        open={Boolean(successMessage)}
+        autoHideDuration={4000}
+        onClose={() => setSuccessMessage("")}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity="success"
+          variant="filled"
+          onClose={() => setSuccessMessage("")}
+        >
+          {successMessage}
+        </Alert>
+      </Snackbar>
     </Main>
   );
 };

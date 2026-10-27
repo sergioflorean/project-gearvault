@@ -1,10 +1,10 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { Alert, Box, Button, Stack, Typography } from "@mui/material";
+import { Alert, Box, Button, Stack, Typography, Snackbar } from "@mui/material";
 import Main from "../../components/Main/Main";
 import GearCard from "../../components/GearCard/GearCard";
 import InstrumentFormDialog from "../../components/InstrumentFormDialog/InstrumentFormDialog";
 import { parseInstrumentForm } from "../../utils/instrumentForm";
-
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { createInstrument, getMyInstruments } from "../../utils/instrumentsApi";
 
@@ -12,6 +12,8 @@ import type { CollectionItem } from "../../types/collection";
 
 const MyCollection = () => {
   const { token } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [collection, setCollection] = useState<CollectionItem[]>([]);
@@ -20,6 +22,24 @@ const MyCollection = () => {
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const navigationMessage =
+    (location.state as { successMessage?: string } | null)?.successMessage ??
+    "";
+
+  const notificationMessage = successMessage || navigationMessage;
+
+  const handleCloseNotification = () => {
+    setSuccessMessage("");
+
+    if (navigationMessage) {
+      navigate(location.pathname, {
+        replace: true,
+        state: null,
+      });
+    }
+  };
 
   useEffect(() => {
     if (!token) return;
@@ -85,6 +105,7 @@ const MyCollection = () => {
 
       setCollection((current) => [savedInstrument, ...current]);
       setIsDialogOpen(false);
+      setSuccessMessage("Instrument added successfully.");
     } catch (err: unknown) {
       setSaveError(
         err instanceof Error ? err.message : "Could not save instrument.",
@@ -225,6 +246,20 @@ const MyCollection = () => {
         isSubmitting={isSaving}
         error={saveError}
       />
+      <Snackbar
+        open={Boolean(notificationMessage)}
+        autoHideDuration={4000}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity="success"
+          variant="filled"
+          onClose={handleCloseNotification}
+        >
+          {notificationMessage}
+        </Alert>
+      </Snackbar>
     </Main>
   );
 };

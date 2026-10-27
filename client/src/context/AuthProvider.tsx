@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { ApiError, apiRequest } from "../utils/api";
-import { AuthContext, type AuthUser } from "./AuthContext";
+import { CurrentUserContext, type AuthUser } from "./AuthContext";
 
 type AuthProviderProps = {
   children: ReactNode;
@@ -8,13 +8,13 @@ type AuthProviderProps = {
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [token, setToken] = useState<string | null>(() =>
-    sessionStorage.getItem("gearvault_token"),
+    localStorage.getItem("gearvault_token"),
   );
 
   const [user, setUser] = useState<AuthUser | null>(null);
 
   const [isLoading, setIsLoading] = useState(() =>
-    Boolean(sessionStorage.getItem("gearvault_token")),
+    Boolean(localStorage.getItem("gearvault_token")),
   );
 
   const [sessionError, setSessionError] = useState<string | null>(null);
@@ -43,7 +43,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
           err instanceof ApiError &&
           (err.status === 401 || err.status === 404)
         ) {
-          sessionStorage.removeItem("gearvault_token");
+          localStorage.removeItem("gearvault_token");
           setToken(null);
           setUser(null);
           setSessionError(null);
@@ -66,7 +66,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   }, [token]);
 
   const signIn = (newToken: string) => {
-    sessionStorage.setItem("gearvault_token", newToken);
+    localStorage.setItem("gearvault_token", newToken);
     setUser(null);
     setSessionError(null);
     setIsLoading(true);
@@ -74,7 +74,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const signOut = () => {
-    sessionStorage.removeItem("gearvault_token");
+    localStorage.removeItem("gearvault_token");
     setToken(null);
     setUser(null);
     setSessionError(null);
@@ -82,11 +82,11 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   return (
-    <AuthContext.Provider
+    <CurrentUserContext.Provider
       value={{ token, user, isLoading, sessionError, signIn, signOut }}
     >
       {children}
-    </AuthContext.Provider>
+    </CurrentUserContext.Provider>
   );
 };
 
