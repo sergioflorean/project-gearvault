@@ -144,32 +144,6 @@ const GearDetail = () => {
     };
   }, [id, token, originalGear]);
 
-  useEffect(() => {
-    if (!id || !token || originalGear) return;
-
-    let isActive = true;
-
-    const checkOwnership = async () => {
-      try {
-        const instrument = await getInstrumentById(token, id);
-
-        if (isActive) {
-          setOwnedGear({ token, instrument });
-        }
-      } catch {
-        if (isActive) {
-          setOwnedGear(null);
-        }
-      }
-    };
-
-    void checkOwnership();
-
-    return () => {
-      isActive = false;
-    };
-  }, [id, token, originalGear]);
-
   const isOwner = Boolean(
     token && collectionGear && gear?.id === collectionGear.id,
   );
