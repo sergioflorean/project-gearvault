@@ -83,6 +83,12 @@ const InstrumentFormDialog = ({
             label="Year"
             type="number"
             defaultValue={instrument?.year ?? ""}
+            slotProps={{
+              htmlInput: {
+                min: 1900,
+                max: new Date().getFullYear(),
+              },
+            }}
             fullWidth
           />
 
@@ -103,6 +109,7 @@ const InstrumentFormDialog = ({
           <TextField
             name="imageUrl"
             label="Image URL (Optional)"
+            type="url"
             placeholder="https://example.com/guitar.jpg"
             helperText="Paste a direct image link, or leave this blank."
             defaultValue={instrument?.imageUrl ?? ""}

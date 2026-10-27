@@ -206,3 +206,35 @@ export const deleteInstrument = async (req: Request, res: Response) => {
     message: "Instrument deleted successfully",
   });
 };
+
+export const getPublicInstruments = async (_req: Request, res: Response) => {
+  const instruments = await Instrument.find()
+    .select("brand model category year finish imageUrl availability addedAt")
+    .sort({ createdAt: -1 });
+
+  res.status(200).json({ instruments });
+};
+
+export const getPublicInstrumentById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  if (typeof id !== "string" || !mongoose.isValidObjectId(id)) {
+    res.status(400).json({
+      message: "Invalid instrument ID",
+    });
+    return;
+  }
+
+  const instrument = await Instrument.findById(id).select(
+    "brand model category year finish imageUrl availability addedAt",
+  );
+
+  if (!instrument) {
+    res.status(404).json({
+      message: "Instrument not found",
+    });
+    return;
+  }
+
+  res.status(200).json({ instrument });
+};

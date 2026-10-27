@@ -1,5 +1,6 @@
 import type { CollectionItem } from "../types/collection";
 import { apiRequest } from "./api";
+import type { GearPreview } from "../types/gear";
 
 type InstrumentDocument = Omit<CollectionItem, "id"> & {
   _id: string;
@@ -117,4 +118,34 @@ export const deleteInstrument = async (
     },
     token,
   );
+};
+
+type PublicInstrumentDocument = Omit<GearPreview, "id"> & {
+  _id: string;
+};
+
+export const getPublicInstruments = async (): Promise<GearPreview[]> => {
+  const data = await apiRequest<{
+    instruments: PublicInstrumentDocument[];
+  }>("/api/explore");
+
+  return data.instruments.map(({ _id, ...instrument }) => ({
+    ...instrument,
+    id: _id,
+  }));
+};
+
+export const getPublicInstrumentById = async (
+  id: string,
+): Promise<GearPreview> => {
+  const data = await apiRequest<{
+    instrument: PublicInstrumentDocument;
+  }>(`/api/explore/${id}`);
+
+  const { _id, ...instrument } = data.instrument;
+
+  return {
+    ...instrument,
+    id: _id,
+  };
 };

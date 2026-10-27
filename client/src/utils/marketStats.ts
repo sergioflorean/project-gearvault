@@ -1,4 +1,5 @@
 import type { GearMarketData } from "../types/gear";
+import { MIN_LISTINGS_FOR_ESTIMATE } from "./marketConfig";
 
 type MarketListing = GearMarketData["listings"][number];
 
@@ -46,7 +47,7 @@ export const calculateMarketStats = (
     (a, b) => b[1].length - a[1].length,
   )[0];
 
-  if (!largestGroup || largestGroup[1].length < 3) {
+  if (!largestGroup || largestGroup[1].length < MIN_LISTINGS_FOR_ESTIMATE) {
     return null;
   }
 

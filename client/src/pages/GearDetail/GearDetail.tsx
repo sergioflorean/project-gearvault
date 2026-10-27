@@ -21,15 +21,17 @@ import { fetchReverbListings } from "../../utils/reverbApi";
 import { mapReverbListingsToMarketData } from "../../utils/reverbMapper";
 import {
   getInstrumentById,
+  getPublicInstrumentById,
   updateInstrument,
   deleteInstrument,
 } from "../../utils/instrumentsApi";
+import { parseInstrumentForm } from "../../utils/instrumentForm";
 import InstrumentFormDialog from "../../components/InstrumentFormDialog/InstrumentFormDialog";
 
 import { useAuth } from "../../context/AuthContext";
 
 import type { CollectionItem } from "../../types/collection";
-import type { GearMarketData } from "../../types/gear";
+import type { GearMarketData, GearPreview } from "../../types/gear";
 
 const GearDetail = () => {
   const { id } = useParams();
@@ -38,16 +40,23 @@ const GearDetail = () => {
   const fromCollection = location.state?.fromCollection === true;
   const { token } = useAuth();
 
-  const [collectionGear, setCollectionGear] = useState<CollectionItem | null>(
-    null,
-  );
+  const [publicGear, setPublicGear] = useState<GearPreview | null>(null);
+
+  const [ownedGear, setOwnedGear] = useState<{
+    token: string;
+    instrument: CollectionItem;
+  } | null>(null);
+
+  const collectionGear =
+    ownedGear?.token === token ? ownedGear.instrument : null;
   const [detailError, setDetailError] = useState("");
 
   const [marketResult, setMarketResult] = useState<{
-    gearId: string;
+    queryKey: string;
     status: "success" | "error";
     data?: GearMarketData;
   } | null>(null);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [id]);
@@ -55,7 +64,7 @@ const GearDetail = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editError, setEditError] = useState("");
-  const [updatedGear, setUpdatedGear] = useState<CollectionItem | null>(null);
+
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
@@ -65,23 +74,33 @@ const GearDetail = () => {
   );
 
   const gear =
-    updatedGear?.id === id
-      ? updatedGear
-      : collectionGear?.id === id
-        ? collectionGear
+    collectionGear?.id === id
+      ? collectionGear
+      : publicGear?.id === id
+        ? publicGear
         : originalGear;
 
+  const gearId = gear?.id;
+  const brand = gear?.brand;
+  const model = gear?.model;
+  const category = gear?.category;
+
+  const marketKey =
+    gearId && brand && model && category
+      ? JSON.stringify([gearId, brand, model, category])
+      : null;
+
   useEffect(() => {
-    if (!id || !token || originalGear) return;
+    if (!id || originalGear) return;
 
     let isActive = true;
 
-    const loadInstrument = async () => {
+    const loadPublicInstrument = async () => {
       try {
-        const instrument = await getInstrumentById(token, id);
+        const instrument = await getPublicInstrumentById(id);
 
         if (isActive) {
-          setCollectionGear(instrument);
+          setPublicGear(instrument);
           setDetailError("");
         }
       } catch (err: unknown) {
@@ -93,7 +112,58 @@ const GearDetail = () => {
       }
     };
 
-    void loadInstrument();
+    void loadPublicInstrument();
+
+    return () => {
+      isActive = false;
+    };
+  }, [id, originalGear]);
+  useEffect(() => {
+    if (!id || !token || originalGear) return;
+
+    let isActive = true;
+
+    const checkOwnership = async () => {
+      try {
+        const instrument = await getInstrumentById(token, id);
+
+        if (isActive) {
+          setOwnedGear({ token, instrument });
+        }
+      } catch {
+        if (isActive) {
+          setOwnedGear(null);
+        }
+      }
+    };
+
+    void checkOwnership();
+
+    return () => {
+      isActive = false;
+    };
+  }, [id, token, originalGear]);
+
+  useEffect(() => {
+    if (!id || !token || originalGear) return;
+
+    let isActive = true;
+
+    const checkOwnership = async () => {
+      try {
+        const instrument = await getInstrumentById(token, id);
+
+        if (isActive) {
+          setOwnedGear({ token, instrument });
+        }
+      } catch {
+        if (isActive) {
+          setOwnedGear(null);
+        }
+      }
+    };
+
+    void checkOwnership();
 
     return () => {
       isActive = false;
@@ -105,27 +175,28 @@ const GearDetail = () => {
   );
 
   const marketStatus =
-    gear && marketResult && marketResult.gearId === gear.id
+    marketKey && marketResult?.queryKey === marketKey
       ? marketResult.status
       : "loading";
+
   useEffect(() => {
-    if (!gear) return;
+    if (!marketKey || !brand || !model || !category) return;
+
     let isActive = true;
+
     const loadListings = async () => {
       try {
-        const response = await fetchReverbListings(
-          gear.brand,
-          gear.model,
-          gear.category,
-        );
+        const response = await fetchReverbListings(brand, model, category);
+
         const mappedData = mapReverbListingsToMarketData(
           response,
-          gear.brand,
-          gear.model,
+          brand,
+          model,
         );
+
         if (isActive) {
           setMarketResult({
-            gearId: gear.id,
+            queryKey: marketKey,
             status: "success",
             data: mappedData,
           });
@@ -133,18 +204,21 @@ const GearDetail = () => {
       } catch (error) {
         if (isActive) {
           console.error("Error loading Reverb listings:", error);
+
           setMarketResult({
-            gearId: gear.id,
+            queryKey: marketKey,
             status: "error",
           });
         }
       }
     };
+
     void loadListings();
+
     return () => {
       isActive = false;
     };
-  }, [gear]);
+  }, [marketKey, brand, model, category]);
   const identification = gear?.identification;
   const hasIdentification = Boolean(
     identification &&
@@ -168,34 +242,21 @@ const GearDetail = () => {
     if (!gear || !isOwner || !token || isSaving) return;
 
     const formData = new FormData(event.currentTarget);
+    const instrumentData = parseInstrumentForm(formData);
 
-    const brand = String(formData.get("brand") ?? "").trim();
-    const model = String(formData.get("model") ?? "").trim();
-
-    if (!brand || !model) return;
-
-    const yearValue = String(formData.get("year") ?? "").trim();
+    if (!instrumentData.brand || !instrumentData.model) return;
 
     setIsSaving(true);
     setEditError("");
 
     try {
-      const updatedInstrument = await updateInstrument(token, gear.id, {
-        brand,
-        model,
-        category: formData.get("category") as CollectionItem["category"],
-        year: yearValue ? Number(yearValue) : undefined,
-        finish: String(formData.get("finish") ?? "").trim() || undefined,
-        serialNumber:
-          String(formData.get("serialNumber") ?? "").trim() || undefined,
-        imageUrl: String(formData.get("imageUrl") ?? "").trim() || undefined,
-        availability: formData.get(
-          "availability",
-        ) as CollectionItem["availability"],
-      });
+      const updatedInstrument = await updateInstrument(
+        token,
+        gear.id,
+        instrumentData,
+      );
 
-      setCollectionGear(updatedInstrument);
-      setUpdatedGear(updatedInstrument);
+      setOwnedGear({ token, instrument: updatedInstrument });
       setIsEditDialogOpen(false);
     } catch (err: unknown) {
       setEditError(
@@ -233,9 +294,7 @@ const GearDetail = () => {
     }
   };
 
-  const isLoadingDetail = Boolean(
-    id && token && !originalGear && !gear && !detailError,
-  );
+  const isLoadingDetail = Boolean(id && !originalGear && !gear && !detailError);
 
   return (
     <Main>
@@ -546,7 +605,7 @@ const GearDetail = () => {
           <MarketInfo
             gearName={`${gear.brand} ${gear.model}`}
             marketData={
-              marketResult && marketResult.gearId === gear.id
+              marketResult?.queryKey === marketKey
                 ? marketResult.data
                 : undefined
             }

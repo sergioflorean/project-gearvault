@@ -3,6 +3,7 @@ import { Alert, Box, Button, Stack, Typography } from "@mui/material";
 import Main from "../../components/Main/Main";
 import GearCard from "../../components/GearCard/GearCard";
 import InstrumentFormDialog from "../../components/InstrumentFormDialog/InstrumentFormDialog";
+import { parseInstrumentForm } from "../../utils/instrumentForm";
 
 import { useAuth } from "../../context/AuthContext";
 import { createInstrument, getMyInstruments } from "../../utils/instrumentsApi";
@@ -72,31 +73,15 @@ const MyCollection = () => {
     if (!token || isSaving) return;
 
     const formData = new FormData(event.currentTarget);
+    const instrumentData = parseInstrumentForm(formData);
 
-    const brand = String(formData.get("brand") ?? "").trim();
-    const model = String(formData.get("model") ?? "").trim();
-
-    if (!brand || !model) return;
-
-    const yearValue = String(formData.get("year") ?? "").trim();
+    if (!instrumentData.brand || !instrumentData.model) return;
 
     setIsSaving(true);
     setSaveError("");
 
     try {
-      const savedInstrument = await createInstrument(token, {
-        brand,
-        model,
-        category: formData.get("category") as CollectionItem["category"],
-        year: yearValue ? Number(yearValue) : undefined,
-        finish: String(formData.get("finish") ?? "").trim() || undefined,
-        serialNumber:
-          String(formData.get("serialNumber") ?? "").trim() || undefined,
-        imageUrl: String(formData.get("imageUrl") ?? "").trim() || undefined,
-        availability: formData.get(
-          "availability",
-        ) as CollectionItem["availability"],
-      });
+      const savedInstrument = await createInstrument(token, instrumentData);
 
       setCollection((current) => [savedInstrument, ...current]);
       setIsDialogOpen(false);

@@ -10,7 +10,6 @@ export interface GearPreview {
   imageUrl?: string;
   availability: GearAvailability;
   identification?: GearIdentification;
-  marketData?: GearMarketData;
 }
 
 export interface GearIdentification {

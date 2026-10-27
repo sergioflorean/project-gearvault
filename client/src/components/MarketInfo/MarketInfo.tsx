@@ -9,7 +9,10 @@ import {
 import type { GearMarketData } from "../../types/gear";
 import { calculateMarketStats } from "../../utils/marketStats";
 import { useState } from "react";
-import { INITIAL_LISTINGS } from "../../utils/marketConfig";
+import {
+  INITIAL_LISTINGS,
+  MIN_LISTINGS_FOR_RANGE,
+} from "../../utils/marketConfig";
 
 interface MarketInfoProps {
   gearName: string;
@@ -116,7 +119,7 @@ const MarketInfo = ({
                   </Typography>
                 </Box>
 
-                {marketStats.sampleSize >= 5 && (
+                {marketStats.sampleSize >= MIN_LISTINGS_FOR_RANGE && (
                   <Box>
                     <Typography variant="body2" color="text.secondary">
                       Common price range
@@ -189,11 +192,7 @@ const MarketInfo = ({
               )}
 
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                {listing.price.toLocaleString("en-US", {
-                  style: "currency",
-                  currency: listing.currency,
-                })}{" "}
-                {listing.currency}
+                {formatMarketPrice(listing.price, listing.currency)}
               </Typography>
             </Stack>
           ))}

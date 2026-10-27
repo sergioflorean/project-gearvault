@@ -1,4 +1,5 @@
 import {
+  Alert,
   Stack,
   Typography,
   Box,
@@ -8,13 +9,51 @@ import {
 } from "@mui/material";
 import Main from "../../components/Main/Main";
 import GearCard from "../../components/GearCard/GearCard";
-import { mockGear } from "../../utils/mockGear";
 import { useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { getPublicInstruments } from "../../utils/instrumentsApi";
+import type { GearPreview } from "../../types/gear";
 
 type CategoryFilter = "all" | "guitar" | "amp" | "pedal" | "";
 
 const Explore = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [publicGear, setPublicGear] = useState<GearPreview[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+
+  useEffect(() => {
+    let isActive = true;
+
+    const loadPublicGear = async () => {
+      try {
+        const instruments = await getPublicInstruments();
+
+        if (isActive) {
+          setPublicGear(instruments);
+          setLoadError("");
+        }
+      } catch (err: unknown) {
+        if (isActive) {
+          setLoadError(
+            err instanceof Error
+              ? err.message
+              : "Could not load community instruments.",
+          );
+        }
+      } finally {
+        if (isActive) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadPublicGear();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
 
   const searchQuery = searchParams.get("search") ?? "";
 
@@ -47,7 +86,7 @@ const Explore = () => {
     );
   };
 
-  const filteredGear = mockGear.filter((gear) => {
+  const filteredGear = publicGear.filter((gear) => {
     const searchTerms = searchQuery.toLowerCase().trim().split(/\s+/);
 
     const gearText = `
@@ -188,7 +227,13 @@ const Explore = () => {
             </Typography>
           </Stack>
 
-          {hasResults ? (
+          {isLoading ? (
+            <Typography color="text.secondary">
+              Loading community instruments...
+            </Typography>
+          ) : loadError ? (
+            <Alert severity="error">{loadError}</Alert>
+          ) : hasResults ? (
             <Box
               sx={{
                 display: "grid",
