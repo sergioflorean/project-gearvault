@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import {
   Alert,
@@ -91,6 +91,15 @@ const SignIn = () => {
             </Button>
           </Stack>
         </Box>
+
+        <Button
+          component={Link}
+          to="/signup"
+          variant="text"
+          sx={{ alignSelf: "flex-start", textTransform: "none" }}
+        >
+          Don't have an account? Sign Up
+        </Button>
       </Stack>
     </Container>
   );
