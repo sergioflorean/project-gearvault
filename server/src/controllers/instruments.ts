@@ -135,14 +135,20 @@ export const updateInstrument = async (req: Request, res: Response) => {
   ];
 
   const updates: Record<string, unknown> = {};
+  const unsetFields: Record<string, 1> = {};
+  const clearableFields = ["year", "finish", "serialNumber", "imageUrl"];
 
   for (const field of allowedFields) {
-    if (req.body[field] !== undefined) {
-      updates[field] = req.body[field];
+    const value: unknown = req.body[field];
+
+    if (value === null && clearableFields.includes(field)) {
+      unsetFields[field] = 1;
+    } else if (value !== undefined) {
+      updates[field] = value;
     }
   }
 
-  if (Object.keys(updates).length === 0) {
+  if (Object.keys(updates).length === 0 && Object.keys(unsetFields).length === 0) {
     res.status(400).json({
       message: ERROR_MESSAGES.NO_VALID_FIELDS,
     });
@@ -155,7 +161,10 @@ export const updateInstrument = async (req: Request, res: Response) => {
         _id: id,
         owner: req.user?.userId,
       },
-      { $set: updates },
+      {
+        ...(Object.keys(updates).length > 0 && { $set: updates }),
+        ...(Object.keys(unsetFields).length > 0 && { $unset: unsetFields }),
+      },
       {
         new: true,
         runValidators: true,

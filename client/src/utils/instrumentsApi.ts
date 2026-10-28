@@ -28,15 +28,12 @@ export const getMyInstruments = async (
 
 type NewInstrument = Pick<
   CollectionItem,
-  | "brand"
-  | "model"
-  | "category"
-  | "year"
-  | "finish"
-  | "serialNumber"
-  | "imageUrl"
-  | "availability"
->;
+  "brand" | "model" | "category" | "availability"
+> & {
+  [Field in "year" | "finish" | "serialNumber" | "imageUrl"]?:
+    | CollectionItem[Field]
+    | null;
+};
 
 type CreateInstrumentResponse = {
   instrument: InstrumentDocument;
@@ -50,7 +47,14 @@ export const createInstrument = async (
     "/api/instruments",
     {
       method: "POST",
-      body: JSON.stringify(instrument),
+      // Creation keeps omitting empty optional fields; null is for PATCH removal.
+      body: JSON.stringify({
+        ...instrument,
+        year: instrument.year ?? undefined,
+        finish: instrument.finish ?? undefined,
+        serialNumber: instrument.serialNumber ?? undefined,
+        imageUrl: instrument.imageUrl ?? undefined,
+      }),
     },
     token,
   );
