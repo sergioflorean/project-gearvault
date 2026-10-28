@@ -12,6 +12,7 @@ import ToneHunter from "./pages/ToneHunter/ToneHunter";
 import MyCollection from "./pages/MyCollection/MyCollection";
 import Wantlist from "./pages/Wantlist/Wantlist";
 import NotFound from "./pages/NotFound/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
 const App = () => {
   return (
@@ -32,7 +33,14 @@ const App = () => {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/tone-hunter" element={<ToneHunter />} />
-        <Route path="/my-collection" element={<MyCollection />} />
+        <Route
+          path="/my-collection"
+          element={
+            <ProtectedRoute>
+              <MyCollection />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/wantlist" element={<Wantlist />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

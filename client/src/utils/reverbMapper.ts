@@ -33,14 +33,14 @@ export const mapReverbListingsToMarketData = (
         sameModel &&
         Number.isFinite(price) &&
         price > 0 &&
-        listing.price.currency.trim().length > 0
+        /^[A-Z]{3}$/.test(listing.price.currency.trim().toUpperCase())
       );
     })
     .map((listing) => ({
       id: listing.id,
       title: listing.title,
       price: Number(listing.price.amount),
-      currency: listing.price.currency,
+      currency: listing.price.currency.trim().toUpperCase(),
       url: listing._links?.web?.href,
     }));
 

@@ -1,294 +1,399 @@
 # GearVault — Frontend
 
-**Catalog your gear. Discover its story.**
+**Your gear. Your collection. Your story.**
 
-GearVault is a web application designed for guitarists and music gear enthusiasts to explore, organize, and manage collections of guitars, amplifiers, and effects pedals.
+GearVault is a web application for guitarists and music gear enthusiasts to explore, catalog, and manage guitars, amplifiers, and effects pedals.
 
-This frontend was developed as **Stage 1 of the TripleTen Software Engineering capstone project**.
+The frontend is built with React, TypeScript, Vite, and Material UI. It connects to an Express REST API and MongoDB Atlas for authentication, instrument management, and public catalog data.
 
-The application is built with React, TypeScript, Vite, and Material UI.
+This application is part of the GearVault full-stack capstone project for the TripleTen Software Engineering program.
 
-## Live Application
+## Current Status
 
-**[View GearVault on Vercel](https://gearvault-olive.vercel.app)**
+**Stage 2 — Full-Stack Frontend Live**
 
-The frontend is deployed on Vercel with support for React Router navigation.
+The frontend is deployed on Vercel and connected to the GearVault Express API.
+
+Production URL:
+
+https://gearvault-olive.vercel.app
+
+Authentication, Explore, and personal collection management have been tested through the public application.
+
+Final security checks and project submission remain pending.
 
 ## Technologies
 
 - React 19
 - TypeScript
 - Vite
-- Material UI (MUI)
+- Material UI
+- Emotion
 - React Router
-- Emotion (CSS-in-JS)
-- Browser localStorage
+- Fetch API
 - Reverb API
 - Vercel
 
-## Implemented Features — Stage 1
+## Features
 
-### Explore
+### Public Explore
 
-- Browse a predefined catalog of guitars, amplifiers, and effects pedals.
-- Search instruments by brand, model, category, or finish.
+Explore provides a public catalog of instruments retrieved from the GearVault backend.
+
+Visitors can:
+
+- Browse guitars, amplifiers, and effects pedals.
+- Search by brand, model, category, and finish.
 - Filter instruments by category.
-- Open detailed instrument pages.
-- Display instrument photographs.
-- View instruments added to the current user's local collection.
+- View photographs, specifications, and availability.
+- Open individual instrument detail pages.
+- Access the catalog without signing in.
+
+Search and category filters are reflected in the URL parameters.
+
+The catalog retrieves data from the GET /api/explore endpoint rather than browser localStorage.
+
+### Authentication
+
+GearVault provides registration and sign-in forms connected to the backend.
+
+Authentication features include:
+
+- User registration with name, email, and password.
+- Login using an email and password.
+- JWT authentication.
+- Token persistence using localStorage.
+- Session validation through GET /users/me.
+- Automatic removal of invalid or expired credentials.
+- Sign-out functionality.
+- Protected navigation for personal collections.
+
+Authentication state is managed through CurrentUserContext and AuthProvider.
+
+The authentication token is stored under the gearvault_token key in localStorage.
+
+### My Collection
+
+Authenticated users can maintain their own instrument collections.
+
+Available actions include:
+
+- Add guitars, amplifiers, and pedals.
+- View saved instruments.
+- Edit existing instrument information.
+- Delete instruments.
+- Save image URLs.
+- Specify availability status.
+- View collection statistics by category.
+- Receive success notifications for instrument operations.
+
+Instrument information can include:
+
+- Brand
+- Model
+- Category
+- Year
+- Finish
+- Serial number
+- Image URL
+- Availability
+
+Supported availability values are Not for sale, For sale, and Open to trade.
+
+Personal collections are stored in MongoDB through the backend API. They are not stored in localStorage.
 
 ### Gear Detail
 
-- View available instrument specifications and identification information.
-- Display instrument photographs or fallback placeholders.
-- View instrument availability: Not for Sale, For Sale, or Open to Trade.
-- Edit or delete instruments owned by the simulated current user.
-- Retrieve live third-party marketplace listings from Reverb.
-- Display loading, empty, and error states for API requests.
-- View marketplace prices and external listing links.
-- Expand or collapse marketplace results.
+Gear Detail displays information about individual instruments.
+
+The page includes:
+
+- Brand, model, category, and year.
+- Finish and availability status.
+- Instrument photography or a placeholder.
+- Available identification information.
+- Reverb marketplace listings.
+- Market price references.
+
+Authenticated owners can also edit or delete their instruments.
+
+Ownership is verified using the backend rather than relying on frontend state alone.
+
+### Reverb Marketplace Integration
+
+GearVault integrates with the public Reverb API to retrieve active marketplace listings.
+
+The integration is implemented in src/utils/reverbApi.ts.
+
+Requests use instrument information such as brand, model, and category.
+
+The interface supports:
+
+- Loading indicators.
+- Marketplace listing details.
+- Asking prices and currencies.
+- Links to external listings.
+- Empty-result messages.
+- Error handling.
+- Expandable marketplace results.
 
 ### Market Price Reference
 
-GearVault uses comparable Reverb marketplace listings to provide an estimated market price reference.
+GearVault uses comparable Reverb listings to provide informational market price references.
 
-The feature:
+The calculations:
 
-- Calculates the median asking price from comparable listings.
-- Displays a reference price range.
-- Avoids combining prices from different currencies.
-- Requires at least three comparable listings before displaying an estimate.
-- Hides estimates when insufficient comparable data is available.
+- Use the median asking price.
+- Require at least three comparable listings.
+- Avoid combining prices from different currencies.
+- Display a reference range when sufficient information is available.
 
-**Important:** Market Price Reference uses active listing prices, not confirmed sale prices. It should not be interpreted as a professional appraisal or guaranteed market value.
+These estimates are based on active asking prices, not completed sales.
 
-### My Collection
+They should not be interpreted as professional appraisals or guaranteed market values.
 
-- Add guitars, amplifiers, and effects pedals.
-- Edit and delete saved instruments.
-- Save instrument details, including brand, model, year, finish, availability, and optional serial number.
-- Add an optional instrument photograph using an image URL.
-- Edit, replace, or remove existing image URLs.
-- Display photographs in My Collection, Explore, and Gear Detail.
-- Display placeholders when no image is available.
-- Store collection data in browser localStorage.
-- Preserve collection data after refreshing the page.
-- Display collection statistics by category.
-- Show newly created instruments first.
+### Responsive Interface
 
-### Navigation
+The application supports desktop, tablet, and mobile layouts.
 
-- React Router handles navigation between application pages.
-- Explore, My Collection, Gear Detail, and About are implemented.
-- Additional routes provide placeholders for features planned for later development.
-- Responsive layouts support desktop and mobile navigation.
+The interface includes:
 
-## How the Explore Demo Works
+- Responsive navigation.
+- Flexible instrument cards.
+- Adaptable forms.
+- Loading and empty states.
+- Success and error notifications.
+- Consistent components and typography.
 
-**Stage 1 does not include a backend, user authentication, or a shared database.**
+## Frontend Architecture
 
-To demonstrate how a future community feed will work, GearVault temporarily combines two sources of instrument data:
+The React application is organized into separate directories for pages, components, context, types, and utilities.
 
-1. **Demo catalog:** `src/utils/mockGear.ts` contains predefined instruments representing example community content.
-2. **Personal collection:** `src/utils/collectionStorage.ts` saves instruments created by the current user in browser localStorage.
+### Components
 
-The `getExploreGear()` function in `src/utils/exploreGear.ts` converts personal collection entries into the shared `GearPreview` structure and combines them with the demo catalog.
+The components directory contains reusable interface elements.
 
-This allows both sources to use the same `GearCard` and `GearDetail` components.
+Examples include:
 
-In Stage 1, newly added instruments automatically appear in Explore. However, they are visible only within the current browser's local data, not to other users on different devices.
+- Header
+- Footer
+- Navigation
+- GearCard
+- InstrumentFormDialog
+- MarketInfo
+- AvailabilityBadge
+- ProtectedRoute
 
-The public preview mapping excludes personal collection fields such as serial numbers.
+### Pages
 
-**This is an intentional frontend-only demonstration of the planned community experience, not a completed multi-user feed.**
+The pages directory contains application screens.
 
-In Stage 2, this data flow will be replaced by an authenticated backend and persistent database records.
+Implemented pages include:
 
-## Instrument Photos
+- Explore
+- Gear Detail
+- My Collection
+- Sign In
+- Sign Up
+- About
 
-The predefined demo instruments include image assets so visitors can explore a visual catalog.
+Additional routes include Profile, Wantlist, and Tone Hunter.
 
-Personal instrument records support optional image references through the `photoUrls` field.
+Some of these routes are reserved for future functionality.
 
-### Adding Instrument Photos
+### Context
 
-When creating or editing an instrument:
+The context directory manages authentication state.
 
-1. Navigate to **My Collection**.
-2. Select **Add Instrument** or edit an existing instrument.
-3. Enter the instrument information.
-4. Optionally paste a direct image URL into the Image URL field.
-5. Save the instrument.
+AuthProvider stores the current token and user information and validates existing sessions when the application loads.
 
-The photograph will be displayed in My Collection, Explore, and Gear Detail.
+CurrentUserContext makes authentication information available to React components.
 
-Users can also replace or remove an existing image URL when editing an instrument.
+### Utilities
 
-If no image is provided, a placeholder is displayed.
+The utils directory contains shared application logic, including:
 
-### Current Photo Limitations
+- api.ts — Shared HTTP requests and error handling.
+- instrumentsApi.ts — Instrument and public catalog API requests.
+- reverbApi.ts — Reverb API requests.
+- reverbMapper.ts — Marketplace data transformation.
+- marketStats.ts — Market price calculations.
+- instrumentForm.ts — Instrument form processing.
 
-Stage 1 supports images through externally hosted URLs.
+### Types
 
-Direct image uploads from the user's device are not implemented yet.
+The types directory contains TypeScript definitions for instruments, collections, and marketplace data.
 
-**Stage 2 will introduce:**
+## Environment Configuration
 
-- Uploading photographs directly from a device.
-- Storing images through a cloud media service.
-- Saving image references with persistent backend records.
-- Managing uploaded photographs through authenticated user accounts.
+Create a local environment file inside the client directory using the provided example.
 
-This separates the frontend image demonstration from the complete image-storage implementation planned for the full-stack application.
+From the repository root, run:
 
-## Reverb API Integration
+    cp client/.env.example client/.env
 
-GearVault retrieves live third-party marketplace listings using the Reverb API.
+Configure the following values in client/.env:
 
-API requests are implemented in `src/utils/reverbApi.ts` using `fetch()`.
+    VITE_API_URL=http://localhost:3001
+    VITE_REVERB_API_URL=https://api.reverb.com/api
 
-Response types and mapping utilities are maintained in separate TypeScript files.
+VITE_API_URL specifies the GearVault backend address.
 
-The application searches Reverb using instrument information such as brand, model, and category.
+VITE_REVERB_API_URL configures the public Reverb API endpoint.
 
-Available results include:
+Restart the Vite development server after changing environment variables.
 
-- Listing titles.
-- Asking prices.
-- Currency information.
-- External links to Reverb listings.
-
-The interface handles:
-
-- Loading states while requests are in progress.
-- Error messages when requests fail.
-- Empty states when no listings are found.
-- Expandable marketplace results.
-- Market price references when sufficient comparable listings are available.
-
-Third-party marketplace data is used for informational purposes.
-
-### Environment Configuration
-
-The optional environment variable is documented in `.env.example`:
-
-VITE_REVERB_API_URL=https://api.reverb.com/api
-
-If no environment variable is supplied, the application uses the public Reverb API URL as its fallback.
-
-No API key is required for the public listings integration used in this prototype.
-
-The `.env` file is excluded from version control.
+Do not store private credentials in frontend environment variables. Values prefixed with VITE\_ are included in the client application.
 
 ## Getting Started
 
-### Prerequisites
+### Requirements
 
-- Node.js
+- Node.js 24 or later
 - npm
+- A running GearVault backend
+- A configured MongoDB Atlas connection for the backend
 
 ### Installation
 
-From the repository root, navigate to the frontend directory:
+Clone the project and switch to the full-stack branch:
 
-cd client
+    git clone https://github.com/sergioflorean/project-gearvault.git
+    cd project-gearvault
+    git switch stage-fullstack
 
-Install dependencies:
+Install the frontend dependencies:
 
-npm ci
+    npm --prefix client ci
 
-Start the development server:
+Install the backend dependencies if they are not already installed:
 
-npm run dev
+    npm --prefix server ci
 
-Vite will display the local development URL, normally:
+Configure both environment files before starting the application.
 
-http://localhost:5173/
+### Running the Frontend
 
-### Available Scripts
+From the repository root:
 
-| Command           | Description                          |
-| ----------------- | ------------------------------------ |
-| `npm run dev`     | Start the Vite development server    |
-| `npm run lint`    | Run ESLint                           |
-| `npm run build`   | Type-check and build the application |
-| `npm run preview` | Preview the production build locally |
+    npm run dev:client
 
-## Testing the Application
+Alternatively, from the client directory:
 
-The following steps can be used to review the Stage 1 functionality.
+    npm run dev
 
-### My Collection
+Vite normally serves the application at:
 
-1. Navigate to My Collection.
-2. Add a new instrument with its brand, model, category, and other details.
-3. Optionally include an instrument image URL.
-4. Verify that the instrument appears in My Collection.
-5. Open Gear Detail and verify the saved information.
-6. Edit the instrument and update its details or photograph.
-7. Confirm that the instrument appears in Explore.
-8. Refresh the browser and verify that the instrument remains saved.
-9. Delete the instrument and confirm its removal.
+http://localhost:5173
 
-### Reverb Marketplace
+The backend must also be running for authentication, Explore, and collection management to work.
 
-1. Open an instrument from Explore.
-2. Navigate to its marketplace information.
-3. Verify that loading feedback appears while requesting data.
-4. Review the available Reverb listings.
-5. Open a listing using its external link.
-6. Check the Market Price Reference when sufficient comparable results exist.
-7. Verify that empty or error states display appropriate feedback when applicable.
+## Available Commands
+
+From the client directory:
+
+- **npm run dev** — Start the Vite development server.
+- **npm run lint** — Run ESLint.
+- **npm run build** — Type-check and build the frontend.
+- **npm run preview** — Preview the production build locally.
+
+From the repository root:
+
+- **npm run dev:client** — Start the frontend.
+- **npm run lint** — Check frontend and backend.
+- **npm run build** — Build frontend and backend.
+
+## Testing
+
+### Authentication
+
+1. Register a new account.
+2. Sign in with valid credentials.
+3. Verify access to My Collection.
+4. Refresh the page and confirm that the session is restored.
+5. Sign out.
+6. Verify that protected pages require authentication.
+
+### Collection Management
+
+1. Sign in.
+2. Add an instrument.
+3. Confirm that the instrument appears in My Collection.
+4. Open its detail page.
+5. Edit the instrument.
+6. Confirm that the updated information is displayed.
+7. Delete the instrument.
+8. Confirm that it disappears from the collection.
+
+Success notifications should appear after successful operations.
+
+### Explore
+
+1. Open Explore without signing in.
+2. Verify that public instruments load.
+3. Search by brand or model.
+4. Apply a category filter.
+5. Open an instrument.
+6. Verify that its details are displayed.
+
+### Reverb Integration
+
+1. Open an instrument detail page.
+2. Wait for the marketplace results to load.
+3. Review the returned listings.
+4. Open an external Reverb listing.
+5. Verify the market price reference when sufficient listings exist.
 
 ### Responsive Layout
 
-Test the application on desktop and mobile screen sizes, including a viewport width of 320px.
+Check the interface at mobile, tablet, and desktop widths.
 
-Verify that:
+Verify that navigation, instrument cards, forms, and controls remain usable without unwanted horizontal scrolling.
 
-- Navigation remains usable.
-- Content adapts to the available screen width.
-- Instrument cards and forms remain readable.
-- Interactive controls remain accessible.
-- No unwanted horizontal scrolling occurs.
+## Deployment
+
+The React application is deployed on Vercel.
+
+Production URL:
+
+https://gearvault-olive.vercel.app
+
+Production API:
+
+https://gearvault-api.vercel.app
+
+The deployment uses the stage-fullstack branch and the client/ root directory.
+
+VITE_API_URL is configured to point to the production backend.
+
+React Router navigation is supported through client/vercel.json.
 
 ## Current Limitations
 
-Because Stage 1 is a frontend-only prototype:
+- Instrument photographs are provided through URLs rather than direct uploads.
+- Wantlist and trading features are not fully implemented.
+- Tone Hunter is reserved for future development.
+- Automatic serial-number identification is not available.
+- Reverb price references depend on active third-party listings.
 
-- Personal collections are stored per browser using localStorage.
-- Data is not synchronized between devices or users.
-- Authentication and account management are not yet implemented.
-- Ownership checks are simulated on the client and are not security controls.
-- Instrument photos require image URLs rather than direct file uploads.
-- Community interactions and public user profiles are not yet implemented.
-- Market price references are based on active asking prices rather than confirmed completed sales.
-- Marketplace availability and returned results depend on the third-party Reverb API.
+## Related Documentation
 
-## Planned Features — Stage 2
+Main project documentation:
 
-The next development stage will introduce:
+README.md in the repository root.
 
-- Node.js and Express backend.
-- MongoDB database and persistent collection records.
-- User registration and authentication with JWT.
-- Backend-enforced ownership and protected routes.
-- Persistent collections synchronized across devices.
-- Real user profiles and a database-powered Explore feed.
-- Instrument photo uploads and cloud image storage.
-- Expanded serial number identification functionality.
-- Further development of wantlists and trading features.
+Backend documentation:
 
-Future enhancements may include community interactions and more advanced market insights.
+server/README.md
 
-## About the Project
+Reverb integration notes:
 
-GearVault is a TripleTen capstone project developed to demonstrate frontend architecture, reusable React components, TypeScript, client-side data management, third-party API integration, and preparation for a full-stack application.
+docs/reverb-api.md
 
-**Current development stage:** Stage 1 — Frontend Application (Completed).
+GitHub repository:
 
-**Live Application:** https://gearvault-olive.vercel.app
+https://github.com/sergioflorean/project-gearvault
 
-**Repository:** https://github.com/sergioflorean/project-gearvault
+Stage 1 pull request:
 
-**Stage 1 Pull Request:** https://github.com/sergioflorean/project-gearvault/pull/34
+https://github.com/sergioflorean/project-gearvault/pull/34
