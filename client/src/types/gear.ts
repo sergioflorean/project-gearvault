@@ -9,8 +9,8 @@ export interface GearPreview {
   finish?: string;
   imageUrl?: string;
   availability: GearAvailability;
+  ownerName?: string;
   identification?: GearIdentification;
-  marketData?: GearMarketData;
 }
 
 export interface GearIdentification {

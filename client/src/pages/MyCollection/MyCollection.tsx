@@ -1,17 +1,77 @@
-import { useState, type FormEvent } from "react";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { useEffect, useState, type FormEvent } from "react";
+import { Alert, Box, Button, Stack, Typography, Snackbar } from "@mui/material";
 import Main from "../../components/Main/Main";
 import GearCard from "../../components/GearCard/GearCard";
 import InstrumentFormDialog from "../../components/InstrumentFormDialog/InstrumentFormDialog";
+import { parseInstrumentForm } from "../../utils/instrumentForm";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { createInstrument, getMyInstruments } from "../../utils/instrumentsApi";
 
 import type { CollectionItem } from "../../types/collection";
 
-import { loadCollection, saveCollection } from "../../utils/collectionStorage";
-
 const MyCollection = () => {
+  const { token } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [collection, setCollection] =
-    useState<CollectionItem[]>(loadCollection);
+  const [collection, setCollection] = useState<CollectionItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const navigationMessage =
+    (location.state as { successMessage?: string } | null)?.successMessage ??
+    "";
+
+  const notificationMessage = successMessage || navigationMessage;
+
+  const handleCloseNotification = () => {
+    setSuccessMessage("");
+
+    if (navigationMessage) {
+      navigate(location.pathname, {
+        replace: true,
+        state: null,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (!token) return;
+
+    let isActive = true;
+
+    const loadInstruments = async () => {
+      try {
+        const instruments = await getMyInstruments(token);
+
+        if (isActive) {
+          setCollection(instruments);
+        }
+      } catch (err: unknown) {
+        if (isActive) {
+          setLoadError(
+            err instanceof Error ? err.message : "Could not load instruments.",
+          );
+        }
+      } finally {
+        if (isActive) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadInstruments();
+
+    return () => {
+      isActive = false;
+    };
+  }, [token]);
 
   const collectionStats = {
     total: collection.length,
@@ -27,42 +87,32 @@ const MyCollection = () => {
     (a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime(),
   );
 
-  const handleAddInstrument = (event: FormEvent<HTMLFormElement>) => {
+  const handleAddInstrument = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (!token || isSaving) return;
+
     const formData = new FormData(event.currentTarget);
+    const instrumentData = parseInstrumentForm(formData);
 
-    const brand = String(formData.get("brand") ?? "").trim();
-    const model = String(formData.get("model") ?? "").trim();
+    if (!instrumentData.brand || !instrumentData.model) return;
 
-    if (!brand || !model) return;
+    setIsSaving(true);
+    setSaveError("");
 
-    const yearValue = String(formData.get("year") ?? "").trim();
-    const finish = String(formData.get("finish") ?? "").trim();
-    const serialNumber = String(formData.get("serialNumber") ?? "").trim();
-    const imageUrl = String(formData.get("imageUrl") ?? "").trim();
+    try {
+      const savedInstrument = await createInstrument(token, instrumentData);
 
-    const newInstrument: CollectionItem = {
-      id: crypto.randomUUID(),
-      brand,
-      model,
-      category: formData.get("category") as CollectionItem["category"],
-      year: yearValue ? Number(yearValue) : undefined,
-      finish: finish || undefined,
-      serialNumber: serialNumber || undefined,
-      imageUrl: imageUrl || undefined,
-      availability: formData.get(
-        "availability",
-      ) as CollectionItem["availability"],
-      addedAt: new Date().toISOString(),
-    };
-
-    const updatedCollection = [...collection, newInstrument];
-
-    saveCollection(updatedCollection);
-    setCollection(updatedCollection);
-
-    setIsDialogOpen(false);
+      setCollection((current) => [savedInstrument, ...current]);
+      setIsDialogOpen(false);
+      setSuccessMessage("Instrument added successfully.");
+    } catch (err: unknown) {
+      setSaveError(
+        err instanceof Error ? err.message : "Could not save instrument.",
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -89,9 +139,11 @@ const MyCollection = () => {
           <Button
             variant="contained"
             onClick={() => {
+              setSaveError("");
               setIsDialogOpen(true);
             }}
             sx={{ textTransform: "none" }}
+            disabled={isSaving}
           >
             Add Instrument
           </Button>
@@ -141,7 +193,13 @@ const MyCollection = () => {
             ))}
         </Box>
 
-        {collection.length === 0 ? (
+        {isLoading ? (
+          <Typography color="text.secondary">
+            Loading your collection...
+          </Typography>
+        ) : loadError ? (
+          <Alert severity="error">{loadError}</Alert>
+        ) : collection.length === 0 ? (
           <Box
             sx={{
               border: 1,
@@ -185,7 +243,23 @@ const MyCollection = () => {
         instrument={null}
         onClose={() => setIsDialogOpen(false)}
         onSubmit={handleAddInstrument}
+        isSubmitting={isSaving}
+        error={saveError}
       />
+      <Snackbar
+        open={Boolean(notificationMessage)}
+        autoHideDuration={4000}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity="success"
+          variant="filled"
+          onClose={handleCloseNotification}
+        >
+          {notificationMessage}
+        </Alert>
+      </Snackbar>
     </Main>
   );
 };
