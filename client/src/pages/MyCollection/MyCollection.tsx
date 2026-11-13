@@ -48,7 +48,7 @@ const MyCollection = () => {
 
     const loadInstruments = async () => {
       try {
-        const instruments = await getMyInstruments(token);
+        const instruments = await getMyInstruments();
 
         if (isActive) {
           setCollection(instruments);
@@ -101,7 +101,7 @@ const MyCollection = () => {
     setSaveError("");
 
     try {
-      const savedInstrument = await createInstrument(token, instrumentData);
+      const savedInstrument = await createInstrument(instrumentData);
 
       setCollection((current) => [savedInstrument, ...current]);
       setIsDialogOpen(false);

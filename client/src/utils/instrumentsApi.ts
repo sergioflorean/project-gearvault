@@ -11,14 +11,8 @@ type InstrumentsResponse = {
   instruments: InstrumentDocument[];
 };
 
-export const getMyInstruments = async (
-  token: string,
-): Promise<CollectionItem[]> => {
-  const data = await apiRequest<InstrumentsResponse>(
-    "/api/instruments",
-    {},
-    token,
-  );
+export const getMyInstruments = async (): Promise<CollectionItem[]> => {
+  const data = await apiRequest<InstrumentsResponse>("/api/instruments", {});
 
   return data.instruments.map(({ _id, ...instrument }) => ({
     ...instrument,
@@ -40,24 +34,19 @@ type CreateInstrumentResponse = {
 };
 
 export const createInstrument = async (
-  token: string,
   instrument: NewInstrument,
 ): Promise<CollectionItem> => {
-  const data = await apiRequest<CreateInstrumentResponse>(
-    "/api/instruments",
-    {
-      method: "POST",
-      // Creation keeps omitting empty optional fields; null is for PATCH removal.
-      body: JSON.stringify({
-        ...instrument,
-        year: instrument.year ?? undefined,
-        finish: instrument.finish ?? undefined,
-        serialNumber: instrument.serialNumber ?? undefined,
-        imageUrl: instrument.imageUrl ?? undefined,
-      }),
-    },
-    token,
-  );
+  const data = await apiRequest<CreateInstrumentResponse>("/api/instruments", {
+    method: "POST",
+    // Creation keeps omitting empty optional fields; null is for PATCH removal.
+    body: JSON.stringify({
+      ...instrument,
+      year: instrument.year ?? undefined,
+      finish: instrument.finish ?? undefined,
+      serialNumber: instrument.serialNumber ?? undefined,
+      imageUrl: instrument.imageUrl ?? undefined,
+    }),
+  });
 
   const { _id, ...savedInstrument } = data.instrument;
 
@@ -72,13 +61,11 @@ type InstrumentResponse = {
 };
 
 export const getInstrumentById = async (
-  token: string,
   id: string,
 ): Promise<CollectionItem> => {
   const data = await apiRequest<InstrumentResponse>(
     `/api/instruments/${id}`,
     {},
-    token,
   );
 
   const { _id, ...instrument } = data.instrument;
@@ -90,18 +77,13 @@ export const getInstrumentById = async (
 };
 
 export const updateInstrument = async (
-  token: string,
   id: string,
   updates: Partial<NewInstrument>,
 ): Promise<CollectionItem> => {
-  const data = await apiRequest<InstrumentResponse>(
-    `/api/instruments/${id}`,
-    {
-      method: "PATCH",
-      body: JSON.stringify(updates),
-    },
-    token,
-  );
+  const data = await apiRequest<InstrumentResponse>(`/api/instruments/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(updates),
+  });
 
   const { _id, ...instrument } = data.instrument;
 
@@ -111,17 +93,10 @@ export const updateInstrument = async (
   };
 };
 
-export const deleteInstrument = async (
-  token: string,
-  id: string,
-): Promise<void> => {
-  await apiRequest<{ message: string }>(
-    `/api/instruments/${id}`,
-    {
-      method: "DELETE",
-    },
-    token,
-  );
+export const deleteInstrument = async (id: string): Promise<void> => {
+  await apiRequest<{ message: string }>(`/api/instruments/${id}`, {
+    method: "DELETE",
+  });
 };
 
 type PublicInstrumentDocument = Omit<GearPreview, "id"> & {

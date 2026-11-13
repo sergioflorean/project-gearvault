@@ -1,3 +1,4 @@
+import { TOKEN_KEY } from "./constants";
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export class ApiError extends Error {
@@ -13,9 +14,9 @@ export class ApiError extends Error {
 export const apiRequest = async <T>(
   endpoint: string,
   options: RequestInit = {},
-  token?: string,
 ): Promise<T> => {
   const headers = new Headers(options.headers);
+  const token = localStorage.getItem(TOKEN_KEY);
 
   if (options.body) {
     headers.set("Content-Type", "application/json");

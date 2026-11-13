@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { ApiError, apiRequest } from "../utils/api";
 import { CurrentUserContext, type AuthUser } from "./AuthContext";
+import { TOKEN_KEY } from "../utils/constants";
 
 type AuthProviderProps = {
   children: ReactNode;
@@ -8,13 +9,13 @@ type AuthProviderProps = {
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [token, setToken] = useState<string | null>(() =>
-    localStorage.getItem("gearvault_token"),
+    localStorage.getItem(TOKEN_KEY),
   );
 
   const [user, setUser] = useState<AuthUser | null>(null);
 
   const [isLoading, setIsLoading] = useState(() =>
-    Boolean(localStorage.getItem("gearvault_token")),
+    Boolean(localStorage.getItem(TOKEN_KEY)),
   );
 
   const [sessionError, setSessionError] = useState<string | null>(null);
@@ -26,11 +27,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const validateSession = async () => {
       try {
-        const data = await apiRequest<{ user: AuthUser }>(
-          "/users/me",
-          {},
-          token,
-        );
+        const data = await apiRequest<{ user: AuthUser }>("/users/me");
 
         if (isActive) {
           setUser(data.user);
@@ -43,7 +40,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
           err instanceof ApiError &&
           (err.status === 401 || err.status === 404)
         ) {
-          localStorage.removeItem("gearvault_token");
+          localStorage.removeItem(TOKEN_KEY);
           setToken(null);
           setUser(null);
           setSessionError(null);
@@ -66,7 +63,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   }, [token]);
 
   const signIn = (newToken: string) => {
-    localStorage.setItem("gearvault_token", newToken);
+    localStorage.setItem(TOKEN_KEY, newToken);
     setUser(null);
     setSessionError(null);
     setIsLoading(true);
@@ -74,7 +71,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const signOut = () => {
-    localStorage.removeItem("gearvault_token");
+    localStorage.removeItem(TOKEN_KEY);
     setToken(null);
     setUser(null);
     setSessionError(null);

@@ -126,7 +126,7 @@ const GearDetail = () => {
 
     const checkOwnership = async () => {
       try {
-        const instrument = await getInstrumentById(token, id);
+        const instrument = await getInstrumentById(id);
 
         if (isActive) {
           setOwnedGear({ token, instrument });
@@ -225,11 +225,7 @@ const GearDetail = () => {
     setEditError("");
 
     try {
-      const updatedInstrument = await updateInstrument(
-        token,
-        gear.id,
-        instrumentData,
-      );
+      const updatedInstrument = await updateInstrument(gear.id, instrumentData);
 
       setOwnedGear({ token, instrument: updatedInstrument });
       setIsEditDialogOpen(false);
@@ -258,7 +254,7 @@ const GearDetail = () => {
     setDeleteError("");
 
     try {
-      await deleteInstrument(token, instrumentId);
+      await deleteInstrument(instrumentId);
 
       navigate("/my-collection", {
         state: {
